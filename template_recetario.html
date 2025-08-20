@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Recetario CEC</title>
+    <style>
+        @page {
+            size: A5 landscape;
+            margin: 10mm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            font-size: 10px;
+            margin: 0;
+            padding: 0;
+        }
+        
+        .recetario {
+            width: 190mm;
+            height: 128mm;
+            border: 2px solid black;
+            padding: 5mm;
+            position: relative;
+        }
+        
+        .header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .logo {
+            width: 60px;
+            height: 60px;
+            border: 2px solid black;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            margin-right: 15px;
+        }
+        
+        .titulo {
+            flex-grow: 1;
+            font-size: 14px;
+            font-weight: bold;
+        }
+        
+        .numero-recetario {
+            font-size: 16px;
+            font-weight: bold;
+            margin-left: 20px;
+        }
+        
+        .tabla-superior {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        
+        .tabla-superior td, .tabla-superior th {
+            border: 1px solid black;
+            padding: 3px;
+            text-align: center;
+            font-size: 9px;
+        }
+        
+        .campo-grande {
+            border: 1px solid black;
+            padding: 5px;
+            margin-bottom: 8px;
+            height: 25px;
+        }
+        
+        .campo-titulo {
+            font-size: 8px;
+            font-weight: bold;
+            margin-bottom: 2px;
+        }
+        
+        .fila-campos {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+        
+        .campo {
+            border: 1px solid black;
+            padding: 3px;
+            flex: 1;
+            height: 20px;
+        }
+        
+        .campo-pequeno {
+            flex: 0 0 60px;
+        }
+        
+        .tabla-medicamentos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 10px;
+        }
+        
+        .tabla-medicamentos td, .tabla-medicamentos th {
+            border: 1px solid black;
+            padding: 2px;
+            text-align: center;
+            font-size: 8px;
+        }
+        
+        .osecac-column {
+            width: 80px;
+            vertical-align: top;
+        }
+        
+        .fila-inferior {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .conformidad {
+            border: 1px solid black;
+            width: 100px;
+            height: 60px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+        }
+        
+        .sello-circular {
+            width: 60px;
+            height: 40px;
+            border: 1px solid black;
+            border-radius: 50%;
+            position: absolute;
+            top: 5px;
+        }
+        
+        .firma-profesional {
+            border: 1px solid black;
+            flex: 1;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+        
+        .firma-afiliado {
+            border: 1px solid black;
+            flex: 1;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+        
+        .pie-pagina {
+            text-align: center;
+            font-size: 8px;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="recetario">
+        <!-- HEADER -->
+        <div class="header">
+            <div class="logo">CEC</div>
+            <div class="titulo">
+                CENTRO DE EMPLEADOS DE<br>
+                COMERCIO DE CONCEPCION
+            </div>
+            <div class="numero-recetario">N° {NUMERO_RECETARIO}</div>
+        </div>
+        
+        <!-- TABLA SUPERIOR -->
+        <table class="tabla-superior" style="width: 300px; float: right; margin-bottom: 10px;">
+            <tr>
+                <th style="width: 80px;">SOCIO N°</th>
+                <th style="width: 120px;">FECHA DE EMISION</th>
+                <th style="width: 100px;">VALIDO HASTA</th>
+            </tr>
+            <tr>
+                <td>{SOCIO_NUMERO}</td>
+                <td>{FECHA_EMISION}</td>
+                <td>{FECHA_VENCIMIENTO}</td>
+            </tr>
+        </table>
+        
+        <div style="clear: both;"></div>
+        
+        <!-- TITULAR -->
+        <div class="fila-campos">
+            <div class="campo" style="flex: 3;">
+                <div class="campo-titulo">Apellido y Nombre Titular</div>
+                {NOMBRE_TITULAR}
+            </div>
+            <div class="campo" style="flex: 2;">
+                <div class="campo-titulo">Lugar de trabajo</div>
+                {LUGAR_TRABAJO}
+            </div>
+            <div class="campo" style="flex: 1;">
+                <div class="campo-titulo">Importe Total</div>
+            </div>
+        </div>
+        
+        <!-- PACIENTE -->
+        <div class="fila-campos">
+            <div class="campo" style="flex: 4;">
+                <div class="campo-titulo">Apellido y Nombre Paciente</div>
+                {NOMBRE_PACIENTE}
+            </div>
+            <div class="campo campo-pequeno">
+                <div class="campo-titulo">Edad</div>
+            </div>
+            <div class="campo campo-pequeno">
+                <div class="campo-titulo">Sexo</div>
+            </div>
+        </div>
+        
+        <!-- TABLA DE MEDICAMENTOS -->
+        <div style="display: flex; gap: 10px;">
+            <!-- LADO IZQUIERDO - RECETAS -->
+            <div style="flex: 3;">
+                <div class="campo-grande">
+                    <div class="campo-titulo">(1) Rp.</div>
+                </div>
+                <div class="campo-grande">
+                    <div class="campo-titulo">(2) Rp.</div>
+                </div>
+                
+                <!-- DIAGNOSTICOS -->
+                <div style="display: flex; gap: 10px; margin-top: 10px;">
+                    <div class="campo" style="height: 50px;">
+                        <div class="campo-titulo">Diagnóstico (1)</div>
+                    </div>
+                    <div class="campo" style="height: 25px;">
+                        <div class="campo-titulo">Diagnóstico (2)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- LADO DERECHO - MEDICAMENTOS Y OSECAC -->
+            <div style="flex: 2;">
+                <table class="tabla-medicamentos">
+                    <tr>
+                        <th rowspan="3">CANTIDAD<br>RECETADA<br>N° EN LETRAS</th>
+                        <th rowspan="3">PRECIO<br>UNITARIO</th>
+                        <th rowspan="3">%</th>
+                        <th rowspan="3">IMPORTE</th>
+                        <th>OSECAC</th>
+                    </tr>
+                    <tr>
+                        <td>A/c<br>C.E.C</td>
+                    </tr>
+                    <tr>
+                        <td>A/c<br>Farmacia</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td rowspan="2" style="vertical-align: top; padding-top: 10px;">
+                            Abonado<br>por el<br>Afiliado
+                        </td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <!-- FIRMAS -->
+        <div class="fila-inferior">
+            <div class="conformidad">
+                <div class="sello-circular"></div>
+                <span style="position: absolute; bottom: 5px; font-size: 8px;">Conformidad</span>
+            </div>
+            <div class="firma-profesional">
+                <span style="font-size: 8px;">Fecha sello y Firma del Profesional</span>
+            </div>
+            <div class="firma-afiliado">
+                <span style="font-size: 8px;">Fecha Doc N° - Firma del Afiliado</span>
+            </div>
+        </div>
+        
+        <!-- PIE DE PAGINA -->
+        <div class="pie-pagina">
+            Concepción - Serie A 78.000 - 79000 JULIO / {AÑO}
+        </div>
+    </div>
+</body>
+</html>

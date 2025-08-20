@@ -1,0 +1,8 @@
+# Logo del Centro de Empleados de Comercio
+
+Coloque aquí el archivo logo_cec.png para que se muestre en los recetarios.
+
+Formato recomendado:
+- Archivo: logo_cec.png
+- Dimensiones: 100x100 pixeles o similar
+- Formato: PNG con fondo transparente
