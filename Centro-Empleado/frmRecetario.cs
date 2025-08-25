@@ -5,6 +5,8 @@ using System.Drawing.Printing;
 using System.Windows.Forms;
 using Centro_Empleado.Data;
 using Centro_Empleado.Models;
+using System.IO;
+using System.Diagnostics;
 
 namespace Centro_Empleado
 {
@@ -106,13 +108,13 @@ namespace Centro_Empleado
                 }
 
                 // Verificar que puede imprimir 2 recetarios
-                int recetariosEmitidos = dbManager.ContarRecetariosMensuales(afiliadoSeleccionado.Id, DateTime.Now);
-                int limite = afiliadoSeleccionado.TieneGrupoFamiliar ? 4 : 2;
-                if (recetariosEmitidos >= limite - 1)
-                {
-                    MessageBox.Show("No puede imprimir 2 recetarios. Verificar límite mensual.", "Límite excedido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                    return;
-                }
+                // int recetariosEmitidos = dbManager.ContarRecetariosMensuales(afiliadoSeleccionado.Id, DateTime.Now);
+                // int limite = afiliadoSeleccionado.TieneGrupoFamiliar ? 4 : 2;
+                // if (recetariosEmitidos >= limite - 1)
+                // {
+                //     MessageBox.Show("No puede imprimir 2 recetarios. Verificar límite mensual.", "Límite excedido", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                //     return;
+                // }
 
                 // Obtener el próximo número de recetario
                 int numero = dbManager.ObtenerProximoNumeroTalonario();
@@ -125,7 +127,7 @@ namespace Centro_Empleado
                 };
 
                 // Imprimir vista previa y luego imprimir
-                recetarioManager.ImprimirRecetario(this, recetario, afiliadoSeleccionado);
+                ImprimirRecetarioHTML(afiliadoSeleccionado, recetario);
 
                 // Guardar en base de datos después de imprimir
                 dbManager.InsertarRecetario(recetario);
@@ -175,198 +177,126 @@ namespace Centro_Empleado
                                     Font fontNumero, Brush brush, Pen pen, 
                                     int x, int y, int ancho, int alto, Recetario recetario)
         {
+            // Ajustar proporciones para A4 y usar fuentes itálicas
+            // Reducir el tamaño general
+            ancho = 650; // antes 750
+            alto = 300;  // antes 400
+
+            // Fuentes SOLO itálicas
+            Font fontTituloItalic = new Font("Arial", 10, FontStyle.Italic);
+            Font fontNormalItalic = new Font("Arial", 7, FontStyle.Italic);
+            Font fontPequenoItalic = new Font("Arial", 6, FontStyle.Italic);
+            Font fontNumeroItalic = new Font("Arial", 12, FontStyle.Italic);
+
             // Borde principal del recetario
-            g.DrawRectangle(pen, x, y, ancho, alto);
+            g.DrawRectangle(new Pen(Color.Black, 1.2f), x, y, ancho, alto);
 
             // HEADER - Primera fila con logo y título
-            int yHeader = y + 10;
-            
-            // Logo mejorado
+            int yHeader = y + 8;
+            int logoSize = 36;
+            // Logo
             try
             {
                 string logoPath = System.IO.Path.Combine(Application.StartupPath, "Resources", "logo_cec.png");
                 if (!System.IO.File.Exists(logoPath))
-                {
                     logoPath = System.IO.Path.Combine(System.IO.Directory.GetCurrentDirectory(), "Resources", "logo_cec.png");
-                }
-                
                 if (System.IO.File.Exists(logoPath))
                 {
                     using (var logo = Image.FromFile(logoPath))
-                    {
-                        g.DrawImage(logo, x + 10, yHeader, 60, 60);
-                    }
+                        g.DrawImage(logo, x + 8, yHeader, logoSize, logoSize);
                 }
                 else
                 {
-                    // Logo del CEC según imagen real
-                    g.DrawEllipse(new Pen(Color.Black, 2), x + 10, yHeader, 60, 60);
-                    g.DrawEllipse(new Pen(Color.Black, 1), x + 15, yHeader + 5, 50, 50);
-                    g.DrawString("CEC", new Font("Arial", 14, FontStyle.Bold), brush, x + 28, yHeader + 25);
-                    g.DrawString("CENTRO DE", new Font("Arial", 6), brush, x + 18, yHeader + 45);
-                    g.DrawString("EMPLEADOS", new Font("Arial", 6), brush, x + 18, yHeader + 52);
+                    g.DrawEllipse(new Pen(Color.Black, 1.5f), x + 8, yHeader, logoSize, logoSize);
+                    g.DrawString("CEC", new Font("Arial", 9, FontStyle.Bold | FontStyle.Italic), brush, x + 15, yHeader + 13);
                 }
             }
-            catch
-            {
-                g.DrawEllipse(pen, x + 10, yHeader, 60, 60);
-                g.DrawString("CEC", new Font("Arial", 14, FontStyle.Bold), brush, x + 30, yHeader + 25);
-            }
-            
-            // Título principal
-            g.DrawString("CENTRO DE EMPLEADOS DE", new Font("Arial", 14, FontStyle.Bold), brush, x + 80, yHeader + 10);
-            g.DrawString("COMERCIO DE CONCEPCION", new Font("Arial", 14, FontStyle.Bold), brush, x + 80, yHeader + 30);
+            catch { g.DrawEllipse(pen, x + 8, yHeader, logoSize, logoSize); }
 
-            // Número de recetario (lado derecho del header)
-            string numeroRecetario = $"N° {recetario.NumeroTalonario:D6}";
-            g.DrawString(numeroRecetario, new Font("Arial", 16, FontStyle.Bold), brush, x + 450, yHeader + 20);
+            // Título y número (en la misma línea, ocupando todo el ancho)
+            g.DrawString("CENTRO DE EMPLEADOS DE", fontTituloItalic, brush, x + 55, yHeader + 2);
+            g.DrawString("COMERCIO DE CONCEPCIÓN", fontTituloItalic, brush, x + 55, yHeader + 20);
+            g.DrawString("Nº", fontTituloItalic, brush, x + 350, yHeader + 2);
+            g.DrawString(recetario.NumeroTalonario.ToString("D6"), fontNumeroItalic, brush, x + 380, yHeader - 2);
 
-            // TABLA SUPERIOR DERECHA: SOCIO N° | FECHA DE EMISION | VALIDO HASTA
-            int yTablaHeader = yHeader + 55;
-            int xTablaHeader = x + 450;
-            
-            // Headers
-            g.DrawRectangle(pen, xTablaHeader, yTablaHeader, 80, 20);
-            g.DrawString("SOCIO N°", fontPequeno, brush, xTablaHeader + 15, yTablaHeader + 5);
-            
-            g.DrawRectangle(pen, xTablaHeader + 80, yTablaHeader, 120, 20);
-            g.DrawString("FECHA DE EMISION", fontPequeno, brush, xTablaHeader + 85, yTablaHeader + 5);
-            
-            g.DrawRectangle(pen, xTablaHeader + 200, yTablaHeader, 100, 20);
-            g.DrawString("VALIDO HASTA", fontPequeno, brush, xTablaHeader + 210, yTablaHeader + 5);
-            
-            // Campos de datos
-            g.DrawRectangle(pen, xTablaHeader, yTablaHeader + 20, 80, 25);
-            g.DrawRectangle(pen, xTablaHeader + 80, yTablaHeader + 20, 120, 25);
-            g.DrawString(recetario.FechaEmision.ToString("dd/MM/yyyy"), fontPequeno, brush, xTablaHeader + 100, yTablaHeader + 30);
-            g.DrawRectangle(pen, xTablaHeader + 200, yTablaHeader + 20, 100, 25);
-            g.DrawString(recetario.FechaVencimiento.ToString("dd/MM/yyyy"), fontPequeno, brush, xTablaHeader + 220, yTablaHeader + 30);
+            // Datos socio (alineados a la izquierda y con línea para completar)
+            int datosSocioY = yHeader + 2;
+            int datosSocioX = x + 55;
+            int espacioY = 15;
+            int lineaLargo = 70;
+            int espacioEntreCampos = 120;
+            // SOCIO Nº
+            g.DrawString("SOCIO Nº", fontNormalItalic, brush, datosSocioX, datosSocioY);
+            g.DrawLine(pen, datosSocioX + 55, datosSocioY + 10, datosSocioX + 55 + lineaLargo, datosSocioY + 10);
+            // FECHA DE EMISIÓN
+            g.DrawString("FECHA DE EMISIÓN", fontNormalItalic, brush, datosSocioX + espacioEntreCampos, datosSocioY);
+            g.DrawLine(pen, datosSocioX + espacioEntreCampos + 95, datosSocioY + 10, datosSocioX + espacioEntreCampos + 95 + lineaLargo, datosSocioY + 10);
+            // VÁLIDO HASTA
+            g.DrawString("VÁLIDO HASTA", fontNormalItalic, brush, datosSocioX + espacioEntreCampos * 2, datosSocioY);
+            g.DrawLine(pen, datosSocioX + espacioEntreCampos * 2 + 75, datosSocioY + 10, datosSocioX + espacioEntreCampos * 2 + 75 + lineaLargo, datosSocioY + 10);
 
-            // APELLIDO Y NOMBRE TITULAR
-            int yTitular = yTablaHeader + 55;
-            g.DrawRectangle(pen, x + 10, yTitular, 430, 30);
-            g.DrawString("Apellido y Nombre Titular", fontPequeno, brush, x + 15, yTitular + 5);
-            g.DrawString(afiliadoSeleccionado.ApellidoNombre, fontNormal, brush, x + 15, yTitular + 18);
+            // Cuadros principales y textos (ajustados a menor tamaño)
+            int yDatos = yHeader + 45;
+            int altoFila = 18;
+            int anchoCol1 = 180;
+            int anchoCol2 = 120;
+            int anchoCol3 = 80;
+            int anchoCol4 = 80;
+            int anchoCol5 = 80;
 
-            // LUGAR DE TRABAJO | IMPORTE TOTAL (lado derecho del titular)
-            g.DrawRectangle(pen, xTablaHeader, yTitular, 200, 30);
-            g.DrawString("Lugar de trabajo", fontPequeno, brush, xTablaHeader + 5, yTitular + 5);
-            g.DrawString(afiliadoSeleccionado.Empresa, fontPequeno, brush, xTablaHeader + 5, yTitular + 18);
-            
-            g.DrawRectangle(pen, xTablaHeader + 200, yTitular, 100, 30);
-            g.DrawString("Importe", fontPequeno, brush, xTablaHeader + 225, yTitular + 8);
-            g.DrawString("Total", fontPequeno, brush, xTablaHeader + 230, yTitular + 20);
+            // Apellido y Nombre Titular
+            g.DrawRectangle(pen, x + 8, yDatos, anchoCol1, altoFila);
+            g.DrawString("Apellido y Nombre Titular", fontNormalItalic, brush, x + 12, yDatos + 3);
+            // Lugar de trabajo
+            g.DrawRectangle(pen, x + 8 + anchoCol1, yDatos, anchoCol2, altoFila);
+            g.DrawString("Lugar de trabajo", fontNormalItalic, brush, x + 12 + anchoCol1, yDatos + 3);
+            // Importe Total
+            g.DrawRectangle(pen, x + 8 + anchoCol1 + anchoCol2, yDatos, anchoCol3, altoFila);
+            g.DrawString("Importe Total", fontNormalItalic, brush, x + 12 + anchoCol1 + anchoCol2, yDatos + 3);
 
-            // APELLIDO Y NOMBRE PACIENTE
-            int yPaciente = yTitular + 40;
-            g.DrawRectangle(pen, x + 10, yPaciente, 430, 35);
-            g.DrawString("Apellido y Nombre Paciente", fontPequeno, brush, x + 15, yPaciente + 5);
-
-            // EDAD | SEXO (pequeños cuadros junto al paciente)
-            g.DrawRectangle(pen, x + 450, yPaciente, 40, 35);
-            g.DrawString("Edad", fontPequeno, brush, x + 460, yPaciente + 15);
-            
-            g.DrawRectangle(pen, x + 490, yPaciente, 40, 35);
-            g.DrawString("Sexo", fontPequeno, brush, x + 500, yPaciente + 15);
-
-            // TABLA DE MEDICAMENTOS (parte derecha)
-            int yMedicamentos = yPaciente + 40;
-            int xMedicamentos = x + 450;
-            
-            // Headers de medicamentos
-            g.DrawRectangle(pen, xMedicamentos, yMedicamentos, 60, 25);
-            g.DrawString("CANTIDAD", fontPequeno, brush, xMedicamentos + 5, yMedicamentos + 5);
-            g.DrawString("RECETADA", fontPequeno, brush, xMedicamentos + 5, yMedicamentos + 15);
-            
-            g.DrawRectangle(pen, xMedicamentos + 60, yMedicamentos, 80, 25);
-            g.DrawString("N° EN LETRAS", fontPequeno, brush, xMedicamentos + 75, yMedicamentos + 10);
-            
-            g.DrawRectangle(pen, xMedicamentos + 140, yMedicamentos, 70, 25);
-            g.DrawString("PRECIO", fontPequeno, brush, xMedicamentos + 155, yMedicamentos + 5);
-            g.DrawString("UNITARIO", fontPequeno, brush, xMedicamentos + 155, yMedicamentos + 15);
-            
-            g.DrawRectangle(pen, xMedicamentos + 210, yMedicamentos, 30, 25);
-            g.DrawString("%", fontPequeno, brush, xMedicamentos + 220, yMedicamentos + 10);
-            
-            g.DrawRectangle(pen, xMedicamentos + 240, yMedicamentos, 60, 25);
-            g.DrawString("IMPORTE", fontPequeno, brush, xMedicamentos + 255, yMedicamentos + 10);
-            
-            // Columna OSECAC
-            g.DrawRectangle(pen, xMedicamentos + 300, yMedicamentos, 70, 25);
-            g.DrawString("OSECAC", fontPequeno, brush, xMedicamentos + 320, yMedicamentos + 10);
-            
-            // Filas de datos de medicamentos (2 filas según imagen)
-            for (int i = 0; i < 2; i++)
-            {
-                int yFila = yMedicamentos + 25 + (i * 25);
-                g.DrawRectangle(pen, xMedicamentos, yFila, 60, 25);
-                g.DrawRectangle(pen, xMedicamentos + 60, yFila, 80, 25);
-                g.DrawRectangle(pen, xMedicamentos + 140, yFila, 70, 25);
-                g.DrawRectangle(pen, xMedicamentos + 210, yFila, 30, 25);
-                g.DrawRectangle(pen, xMedicamentos + 240, yFila, 60, 25);
-            }
-            
-            // Subcampos de OSECAC
-            g.DrawRectangle(pen, xMedicamentos + 300, yMedicamentos + 25, 70, 25);
-            g.DrawString("A/c", fontPequeno, brush, xMedicamentos + 310, yMedicamentos + 32);
-            g.DrawString("C.E.C", fontPequeno, brush, xMedicamentos + 330, yMedicamentos + 32);
-            
-            g.DrawRectangle(pen, xMedicamentos + 300, yMedicamentos + 50, 70, 25);
-            g.DrawString("A/c", fontPequeno, brush, xMedicamentos + 310, yMedicamentos + 57);
-            g.DrawString("Farmacia", fontPequeno, brush, xMedicamentos + 325, yMedicamentos + 57);
-            
-            // Abonado por el Afiliado (cuadro grande)
-            g.DrawRectangle(pen, xMedicamentos + 300, yMedicamentos + 75, 70, 60);
-            g.DrawString("Abonado", fontPequeno, brush, xMedicamentos + 315, yMedicamentos + 90);
-            g.DrawString("por el", fontPequeno, brush, xMedicamentos + 320, yMedicamentos + 105);
-            g.DrawString("Afiliado", fontPequeno, brush, xMedicamentos + 315, yMedicamentos + 120);
-
-            // RECETAS (lado izquierdo)
-            int yRecetas = yPaciente + 40;
+            // Apellido y Nombre Paciente
+            g.DrawRectangle(pen, x + 8, yDatos + altoFila, anchoCol1, altoFila);
+            g.DrawString("Apellido y Nombre Paciente", fontNormalItalic, brush, x + 12, yDatos + altoFila + 3);
+            // Edad
+            g.DrawRectangle(pen, x + 8 + anchoCol1, yDatos + altoFila, 40, altoFila);
+            g.DrawString("Edad", fontNormalItalic, brush, x + 12 + anchoCol1, yDatos + altoFila + 3);
+            // Sexo
+            g.DrawRectangle(pen, x + 8 + anchoCol1 + 40, yDatos + altoFila, 40, altoFila);
+            g.DrawString("Sexo", fontNormalItalic, brush, x + 12 + anchoCol1 + 40, yDatos + altoFila + 3);
+            // Cantidad Recetada
+            g.DrawRectangle(pen, x + 8 + anchoCol1 + 80, yDatos + altoFila, anchoCol4, altoFila);
+            g.DrawString("CANTIDAD RECETADA", fontNormalItalic, brush, x + 12 + anchoCol1 + 80, yDatos + altoFila + 3);
+            // Precio Unitario
+            g.DrawRectangle(pen, x + 8 + anchoCol1 + 80 + anchoCol4, yDatos + altoFila, anchoCol5, altoFila);
+            g.DrawString("PRECIO UNITARIO", fontNormalItalic, brush, x + 12 + anchoCol1 + 80 + anchoCol4, yDatos + altoFila + 3);
             
             // (1) Rp.
-            g.DrawRectangle(pen, x + 10, yRecetas, 430, 30);
-            g.DrawString("(1) Rp.", fontNormal, brush, x + 15, yRecetas + 10);
-
+            g.DrawRectangle(pen, x + 8, yDatos + altoFila * 2, ancho - 16, altoFila);
+            g.DrawString("(1) Rp.", fontNormalItalic, brush, x + 12, yDatos + altoFila * 2 + 3);
             // (2) Rp.
-            g.DrawRectangle(pen, x + 10, yRecetas + 30, 430, 30);
-            g.DrawString("(2) Rp.", fontNormal, brush, x + 15, yRecetas + 40);
-
-            // DIAGNOSTICOS
-            int yDiagnostico = yRecetas + 70;
+            g.DrawRectangle(pen, x + 8, yDatos + altoFila * 3, ancho - 16, altoFila);
+            g.DrawString("(2) Rp.", fontNormalItalic, brush, x + 12, yDatos + altoFila * 3 + 3);
             
             // Diagnóstico (1)
-            g.DrawRectangle(pen, x + 10, yDiagnostico, 220, 60);
-            g.DrawString("Diagnóstico (1)", fontNormal, brush, x + 15, yDiagnostico + 10);
-
+            g.DrawRectangle(pen, x + 8, yDatos + altoFila * 4, (ancho - 16) / 2, altoFila);
+            g.DrawString("Diagnóstico (1)", fontNormalItalic, brush, x + 12, yDatos + altoFila * 4 + 3);
             // Diagnóstico (2)
-            g.DrawRectangle(pen, x + 240, yDiagnostico, 200, 30);
-            g.DrawString("Diagnóstico (2)", fontNormal, brush, x + 245, yDiagnostico + 10);
+            g.DrawRectangle(pen, x + 8 + (ancho - 16) / 2, yDatos + altoFila * 4, (ancho - 16) / 2, altoFila);
+            g.DrawString("Diagnóstico (2)", fontNormalItalic, brush, x + 12 + (ancho - 16) / 2, yDatos + altoFila * 4 + 3);
 
-            // FIRMAS (parte inferior)
-            int yFirmas = yDiagnostico + 70;
-            
-            // Conformidad (cuadro con sello circular)
-            g.DrawRectangle(pen, x + 10, yFirmas, 100, 60);
-            g.DrawString("Conformidad", fontPequeno, brush, x + 30, yFirmas + 30);
-            
-            // Dibujar círculo del sello
-            g.DrawEllipse(pen, x + 25, yFirmas + 10, 70, 40);
+            // Firmas
+            int yFirmas = yDatos + altoFila * 5;
+            int anchoFirma = (ancho - 16) / 3;
+            g.DrawRectangle(pen, x + 8, yFirmas, anchoFirma, altoFila);
+            g.DrawString("Conformidad", fontPequenoItalic, brush, x + 12, yFirmas + 3);
+            g.DrawRectangle(pen, x + 8 + anchoFirma, yFirmas, anchoFirma, altoFila);
+            g.DrawString("Fecha sello y Firma del Profesional", fontPequenoItalic, brush, x + 12 + anchoFirma, yFirmas + 3);
+            g.DrawRectangle(pen, x + 8 + anchoFirma * 2, yFirmas, anchoFirma, altoFila);
+            g.DrawString("Fecha Doc N° - Firma del Afiliado", fontPequenoItalic, brush, x + 12 + anchoFirma * 2, yFirmas + 3);
 
-            // Fecha sello y Firma del Profesional
-            g.DrawRectangle(pen, x + 110, yFirmas, 170, 30);
-            g.DrawString("Fecha sello y Firma del Profesional", fontPequeno, brush, x + 115, yFirmas + 10);
-
-            // Fecha Doc N° - Firma del Afiliado
-            g.DrawRectangle(pen, x + 280, yFirmas, 160, 30);
-            g.DrawString("Fecha Doc N° - Firma del Afiliado", fontPequeno, brush, x + 285, yFirmas + 10);
-
-            // Segunda fila de firmas
-            g.DrawRectangle(pen, x + 110, yFirmas + 30, 330, 30);
-
-            // PIE DE PÁGINA
+            // Pie de página
             string piePagina = $"Concepción - Serie A 78.000 - 79000 JULIO / {DateTime.Now.Year}";
-            g.DrawString(piePagina, fontPequeno, brush, x + 200, y + alto + 5);
+            g.DrawString(piePagina, fontPequenoItalic, brush, x + ancho - 250, y + alto - 10);
         }
 
         private void LimpiarDatos()
@@ -385,6 +315,49 @@ namespace Centro_Empleado
             txtDNI.Clear();
             LimpiarDatos();
             txtDNI.Focus();
+        }
+
+        private string ReplaceFirst(string text, string search, string replace)
+        {
+            int pos = text.IndexOf(search);
+            if (pos < 0) return text;
+            return text.Substring(0, pos) + replace + text.Substring(pos + search.Length);
+        }
+
+        private void ImprimirRecetarioHTML(Afiliado afiliado, Recetario recetario)
+        {
+            // Ruta de la plantilla HTML
+            string plantillaPath = Path.Combine(Application.StartupPath, "Resources", "recetaFinal.html");
+            if (!File.Exists(plantillaPath))
+            {
+                MessageBox.Show("No se encontró la plantilla HTML de receta.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            string html = File.ReadAllText(plantillaPath);
+
+            // Reemplazar los campos necesarios
+            html = ReplaceFirst(html, "<input type=\"text\">", $"<span>{afiliado.ApellidoNombre}</span>"); // Apellido y Nombre Titular
+            html = ReplaceFirst(html, "<input type=\"text\">", $"<span>{afiliado.Empresa}</span>"); // Lugar de trabajo
+            html = html.Replace("Nº 080097", $"Nº {recetario.NumeroTalonario:D6}"); // Número de receta
+            html = ReplaceFirst(html, "<input type=\"text\" class=\"field-input\">", $"<span>{afiliado.DNI}</span>"); // Socio Nº
+            // Dejar FECHA DE EMISIÓN y VÁLIDO HASTA vacíos (no reemplazar)
+            // No completar nada en (1) Rp. ni (2) Rp. (no reemplazar esos inputs)
+            // Cambiar texto 'Abonado por el Afiliado' a 'Abona afiliado'
+            html = html.Replace("Abonado por el Afiliado", "Abona afiliado");
+
+            // Agregar script para imprimir automáticamente
+            int headClose = html.IndexOf("</head>");
+            if (headClose > 0)
+            {
+                html = html.Insert(headClose, "<script>window.onload=function(){window.print();}</script>");
+            }
+
+            // Guardar archivo temporal
+            string tempFile = Path.Combine(Path.GetTempPath(), $"receta_{recetario.NumeroTalonario:D6}.html");
+            File.WriteAllText(tempFile, html);
+
+            // Abrir en navegador predeterminado
+            Process.Start(new ProcessStartInfo(tempFile) { UseShellExecute = true });
         }
 
     }

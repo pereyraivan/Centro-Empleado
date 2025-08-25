@@ -1,0 +1,604 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulario de Receta Médica - Duplicado A4</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Arial', sans-serif;
+            font-style: italic; /* Aplicar itálico a todo el texto */
+        }
+        body {
+            background-color: #f0f2f5;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .a4-page {
+            width: 210mm;
+            min-height: 297mm;
+            background: white;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-start;
+        }
+        .form-container {
+            height: 145mm; /* ajustado según pedido */
+            border: 1px solid #ccc;
+            margin: 10px 10px 0 10px;
+            page-break-inside: avoid;
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+            /* Cambiado de space-between a flex-start */
+            justify-content: flex-start;
+        }
+        .form-container:last-child {
+            margin-bottom: 10px;
+        }
+        .header {
+            display: flex;
+            align-items: center;
+            padding: 6px 10px;
+            border-bottom: 2px solid #000;
+        }
+        .logo {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-right: 10px;
+            font-weight: bold;
+            font-size: 10px;
+        }
+        .institution-info {
+            flex-grow: 1;
+        }
+        .institution-name {
+            font-size: 11px;
+            font-weight: bold;
+            text-transform: uppercase;
+            line-height: 1.1;
+        }
+        .institution-name-line1 {
+            font-size: 11px;
+        }
+        .institution-name-line2 {
+            font-size: 13px;
+            margin-top: 1px;
+        }
+        .institution-number {
+            font-size: 13px;
+            font-weight: bold;
+            margin-top: 2px;
+        }
+        .vertical-separator {
+            width: 1px;
+            height: 40px;
+            background-color: #000;
+            margin: 0 10px;
+        }
+        .header-fields {
+            display: flex;
+            flex-direction: column;
+            gap: 1px;
+            min-width: 160px;
+        }
+        .field-row {
+            display: flex;
+            align-items: center;
+        }
+        .field-label {
+            font-size: 13px;
+            margin-right: 3px;
+            white-space: nowrap;
+            font-weight: bold;
+            text-transform: none;
+        }
+        .field-input {
+            border: none;
+            border-bottom: 1px solid #000;
+            width: 70px;
+            font-size: 11px;
+            padding: 1px 2px;
+            font-style: italic;
+        }
+        .form-content {
+            padding: 5px 10px 10px 10px; /* Reducido el padding superior */
+            flex-grow: 1; /* Ocupa el espacio restante */
+            display: flex;
+            flex-direction: column;
+            /* Reducir espacio entre elementos hijos */
+            gap: 5px;
+        }
+        .section {
+            margin-bottom: 8px; /* Reducido de 15px */
+        }
+        .section-title {
+            font-weight: bold;
+            margin-bottom: 2px;
+            font-size: 11px;
+            padding-top: 10px;
+        }
+        .form-row {
+            display: flex;
+            margin-bottom: 3px; /* Reducido de 5px */
+        }
+        .form-group {
+            flex: 1;
+            margin-right: 10px;
+			padding-top: 10px;
+        }
+        .form-group:last-child {
+            margin-right: 0;
+        }
+        input[type="text"] {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid #000;
+            padding: 2px 0;
+            font-size: 11px;
+            font-style: italic;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 5px 0; /* Reducido de 8px */
+            font-size: 10px;
+        }
+        th, td {
+            border: 1px solid #000;
+            padding: 3px;
+            text-align: center;
+            height: 14px;
+        }
+        th {
+            font-weight: bold;
+        }
+        .tr-conformidad{	
+            height: 60px;
+        }
+		.fila-importes{		
+			height: 20px;
+		}
+        
+        .diagnosis-section {
+            display: flex;
+            margin: 5px 0; /* Reducido de 8px */
+        }
+        .diagnosis-box {
+            flex: 1;
+            border: none;
+            border-bottom: 1px solid #000;
+            padding: 0;
+            margin-right: 10px;
+            height: auto;
+            padding-top: 15px;
+            position: relative;
+			padding-bottom: 25px;
+
+        }
+        .diagnosis-box:last-child {
+            margin-right: 0;
+        }
+        .diagnosis-title {
+            position: absolute;
+            top: 0;
+            left: 0;
+            font-weight: bold;
+            font-size: 11px;
+        }
+        .medication-row {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px; /* Reducido de 10px */
+            font-size: 14px;
+        }
+        .medication-label {
+            width: 60px;
+            font-weight: bold;
+        }
+        .patient-name-input {
+            margin-top: 3px; /* Reducido de 5px */
+        }
+        .checkbox-section {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0; /* Reducido de 15px */
+        }
+        .checkbox-item {
+            display: flex;
+            align-items: center;
+            flex: 1;
+            margin-right: 15px;
+        }
+        .checkbox-item:last-child {
+            margin-right: 0;
+        }
+        .checkbox-label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+        .checkbox-box {
+            height: 20px;
+            border: 1px solid #000;
+            min-width: 80px;
+        }
+        .abonado-item {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+        .abonado-label {
+            font-size: 13px;
+            font-weight: bold;
+            margin-right: 5px;
+            white-space: nowrap;
+        }
+        .abonado-box {
+            flex: 1;
+            height: 20px;
+            border: 1px solid #000;
+            min-width: 80px;
+        }
+        .patient-info-row {
+            display: flex;
+            align-items: flex-end;
+            margin-bottom: 5px; 	
+            height: 40px;
+        }
+        .patient-name-group {
+            flex: 2;
+            margin-right: 15px;
+        }
+        .patient-age-group {
+            flex: 1;
+            margin-right: 15px;
+        }
+        .patient-gender-group {
+            flex: 1;
+        }
+        .info-box {
+            border: 1px solid #000;
+            padding: 5px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+        }
+        .importe-total-row {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 5px; /* Reducido de 8px */
+        }
+        .importe-total-label {
+            font-weight: bold;
+            margin-right: 5px;
+            font-size: 13px;
+        }
+        .importe-total-box {
+            width: 80px;
+            height: 20px;
+            border: 1px solid #000;
+        }
+        .signature-table {
+            margin-top: 8px; /* Reducido de 10px */
+        }
+        .signature-table th {
+            padding: 4px;
+            font-size: 10px;
+            width: 33.33%;
+        }
+        .signature-table td {
+            height: 20px;
+            vertical-align: bottom;
+            width: 33.33%;
+        }
+        
+        @media print {
+            body {
+                background: none;
+                padding: 0;
+            }
+            .a4-page {
+                box-shadow: none;
+                padding: 0;
+                width: 100%;
+                height: 100%;
+            }
+            .form-container {
+                border: 1px solid #000;
+                margin-bottom: 0;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="a4-page">
+        <!-- Primer formulario -->
+        <div class="form-container">
+            <div class="header">
+                <div class="logo"><img src="logo_cec1.png" alt="Logo" style="width: 40px; height: 40px; object-fit: contain;"></div>
+                <div class="institution-info">
+                    <div class="institution-name">
+                        <span class="institution-name-line1">CENTRO DE EMPLEADOS DE</span>
+                        <span class="institution-name-line2">COMERCIO DE CONCEPCION</span>
+                    </div>
+                    <div class="institution-number">Nº 080097</div>
+                </div>
+                <div class="vertical-separator"></div>
+                <div class="header-fields">
+                    <div class="field-row">
+                        <span class="field-label">Socio Nº</span>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Fecha de emisión</span>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Válido hasta</span>
+                        <input type="text" class="field-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-content">
+                <div class="section">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="section-title">Apellido y Nombre Titular</div>
+                            <input type="text">
+                        </div>
+                        <div class="form-group">
+                            <div class="section-title">Lugar de trabajo</div>
+                            <input type="text">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="patient-info-row">
+                    <div class="patient-name-group">
+                        <div class="section-title">Apellido y Nombre Paciente</div>
+                        <div class="info-box"></div>
+                    </div>
+                    <div class="patient-age-group">
+                        <div class="section-title">Edad</div>
+                        <div class="info-box"></div>
+                    </div>
+                    <div class="patient-gender-group">
+                        <div class="section-title">Sexo</div>
+                        <div class="info-box"></div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CANTIDAD RECETADA</th>
+                            <th>PRECIO UNITARIO</th>
+                            <th>%</th>
+                            <th>IMPORTE</th>
+                        </tr>
+                    </thead>
+                    <tbody class="fila-importes">
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="importe-total-row">
+                    <div class="importe-total-label">Importe Total</div>
+                    <div class="importe-total-box"></div>
+                </div>
+
+                <div class="checkbox-section">
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">OSECAC</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC C.E.C.</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC Farmacia</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="abonado-item">
+                        <div class="abonado-label">Abona Afiliado</div>
+                        <div class="abonado-box"></div>
+                    </div>
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(1) Rp.</div>
+                    <input type="text">
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(2) Rp.</div>
+                    <input type="text">
+                </div>
+
+                <div class="diagnosis-section">
+                    <div class="diagnosis-box">
+                        <div class="diagnosis-title">Diagnóstico (1)</div>
+                    </div>
+                    <div class="diagnosis-box">
+                        <div class="diagnosis-title">Diagnóstico (2)</div>
+                    </div>
+                </div>
+
+                <table class="signature-table">
+                    <thead>
+                        <tr>
+                            <th>Conformidad</th>
+                            <th>Fecha sello y Firma del Profesional</th>
+                            <th>Fecha Doc Nº - Firma del Afiliado</th>
+                        </tr>
+                    </thead>
+                    <tbody >
+                        <tr class="tr-conformidad">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Segundo formulario (duplicado) -->
+        <div class="form-container">
+            <div class="header">
+                <div class="logo"><img src="logo_cec1.png" alt="Logo" style="width: 40px; height: 40px; object-fit: contain;"></div>
+                <div class="institution-info">
+                    <div class="institution-name">
+                        <span class="institution-name-line1">CENTRO DE EMPLEADOS DE</span>
+                        <span class="institution-name-line2">COMERCIO DE CONCEPCION</span>
+                    </div>
+                    <div class="institution-number">Nº 080097</div>
+                </div>
+                <div class="vertical-separator"></div>
+                <div class="header-fields">
+                    <div class="field-row">
+                        <span class="field-label">Socio Nº</span>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Fecha de emisión</span>
+                        <input type="text" class="field-input">
+                    </div>
+                    <div class="field-row">
+                        <span class="field-label">Válido hasta</span>
+                        <input type="text" class="field-input">
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-content">
+                <div class="section">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="section-title">Apellido y Nombre Titular</div>
+                            <input type="text">
+                        </div>
+                        <div class="form-group">
+                            <div class="section-title">Lugar de trabajo</div>
+                            <input type="text">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="patient-info-row">
+                    <div class="patient-name-group">
+                        <div class="section-title">Apellido y Nombre Paciente</div>
+                        <div class="info-box"></div>
+                    </div>
+                    <div class="patient-age-group">
+                        <div class="section-title">Edad</div>
+                        <div class="info-box"></div>
+                    </div>
+                    <div class="patient-gender-group">
+                        <div class="section-title">Sexo</div>
+                        <div class="info-box"></div>
+                    </div>
+                </div>
+
+                <table>
+                    <thead>
+                        <tr>
+                            <th>CANTIDAD RECETADA</th>
+                            <th>PRECIO UNITARIO</th>
+                            <th>%</th>
+                            <th>IMPORTE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="importe-total-row">
+                    <div class="importe-total-label">Importe Total</div>
+                    <div class="importe-total-box"></div>
+                </div>
+
+                <div class="checkbox-section">
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">OSECAC</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC C.E.C.</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC Farmacia</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="abonado-item">
+                        <div class="abonado-label">Abona Afiliado</div>
+                        <div class="abonado-box"></div>
+                    </div>
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(1) Rp.</div>
+                    <input type="text">
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(2) Rp.</div>
+                    <input type="text">
+                </div>
+
+                <div class="diagnosis-section">
+                    <div class="diagnosis-box">
+                        <div class="diagnosis-title">Diagnóstico (1)</div>
+                    </div>
+                    <div class="diagnosis-box">
+                        <div class="diagnosis-title">Diagnóstico (2)</div>
+                    </div>
+                </div>
+
+                <table class="signature-table">
+                    <thead>
+                        <tr>
+                            <th>Conformidad</th>
+                            <th>Fecha sello y Firma del Profesional</th>
+                            <th>Fecha Doc Nº - Firma del Afiliado</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr class= "tr-conformidad">
+                            <td></td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
