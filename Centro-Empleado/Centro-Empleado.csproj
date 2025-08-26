@@ -73,18 +73,6 @@
     <Compile Include="frmAfiliado.Designer.cs">
       <DependentUpon>frmAfiliado.cs</DependentUpon>
     </Compile>
-    <Compile Include="frmPrincipal.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmPrincipal.Designer.cs">
-      <DependentUpon>frmPrincipal.cs</DependentUpon>
-    </Compile>
-    <Compile Include="frmRecetario.cs">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="frmRecetario.Designer.cs">
-      <DependentUpon>frmRecetario.cs</DependentUpon>
-    </Compile>
     <Compile Include="Models\Afiliado.cs" />
     <Compile Include="Models\Familiar.cs" />
     <Compile Include="Models\Recetario.cs" />
@@ -94,12 +82,6 @@
     <Compile Include="SqlServerTypes\Loader.cs" />
     <EmbeddedResource Include="frmAfiliado.resx">
       <DependentUpon>frmAfiliado.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmPrincipal.resx">
-      <DependentUpon>frmPrincipal.cs</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="frmRecetario.resx">
-      <DependentUpon>frmRecetario.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
