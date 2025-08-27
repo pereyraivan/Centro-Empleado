@@ -251,23 +251,39 @@ namespace Centro_Empleado.Data
 
         public int ContarRecetariosMensuales(int idAfiliado, DateTime fechaReferencia)
         {
-            string sql = @"SELECT COUNT(*) FROM Recetario 
-                          WHERE IdAfiliado = @IdAfiliado 
-                          AND strftime('%Y-%m', FechaEmision) = strftime('%Y-%m', @FechaReferencia)";
-
-            using (var connection = new SQLiteConnection(connectionString))
+            // Obtener la fecha de la última impresión
+            var ultimaImpresion = ObtenerUltimaFechaImpresion(idAfiliado);
+            
+            // Si no hay impresiones previas, permitir imprimir
+            if (!ultimaImpresion.HasValue)
+                return 0;
+            
+            // Verificar si han pasado exactamente 30 días desde la última impresión
+            var diasTranscurridos = (fechaReferencia - ultimaImpresion.Value).Days;
+            
+            // Si han pasado menos de 30 días, contar todos los recetarios del afiliado
+            if (diasTranscurridos < 30)
             {
-                connection.Open();
-                using (var command = new SQLiteCommand(sql, connection))
+                string sql = @"SELECT COUNT(*) FROM Recetario 
+                              WHERE IdAfiliado = @IdAfiliado";
+
+                using (var connection = new SQLiteConnection(connectionString))
                 {
-                    command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
-                    command.Parameters.AddWithValue("@FechaReferencia", fechaReferencia);
-                    return Convert.ToInt32(command.ExecuteScalar());
+                    connection.Open();
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        return Convert.ToInt32(command.ExecuteScalar());
+                    }
                 }
             }
+            
+            // Si han pasado 30 días o más, permitir nueva impresión
+            return 0;
         }
 
-        public DateTime? FechaProximaHabilitacion(int idAfiliado)
+        // Método auxiliar para obtener la fecha de la última impresión
+        public DateTime? ObtenerUltimaFechaImpresion(int idAfiliado)
         {
             string sql = @"SELECT MAX(FechaEmision) FROM Recetario WHERE IdAfiliado = @IdAfiliado";
 
@@ -280,11 +296,23 @@ namespace Centro_Empleado.Data
                     var result = command.ExecuteScalar();
                     if (result != DBNull.Value && result != null)
                     {
-                        DateTime ultimaFecha = Convert.ToDateTime(result);
-                        return new DateTime(ultimaFecha.Year, ultimaFecha.Month, 1).AddMonths(1);
+                        return Convert.ToDateTime(result);
                     }
                 }
             }
+            return null;
+        }
+
+        public DateTime? FechaProximaHabilitacion(int idAfiliado)
+        {
+            var ultimaImpresion = ObtenerUltimaFechaImpresion(idAfiliado);
+            
+            if (ultimaImpresion.HasValue)
+            {
+                // Calcular la próxima habilitación: 30 días desde la última impresión
+                return ultimaImpresion.Value.AddDays(30);
+            }
+            
             return null;
         }
 
@@ -302,21 +330,79 @@ namespace Centro_Empleado.Data
             }
         }
 
-        // Método para obtener 2 números consecutivos de una vez
+        // Método para obtener 2 números consecutivos de una vez de manera segura
         public (int primero, int segundo) ObtenerDosNumerosConsecutivos()
         {
-            string sql = "SELECT IFNULL(MAX(NumeroTalonario), 0) + 1 FROM Recetario";
-
             using (var connection = new SQLiteConnection(connectionString))
             {
                 connection.Open();
-                using (var command = new SQLiteCommand(sql, connection))
+                using (var transaction = connection.BeginTransaction())
                 {
-                    int primero = Convert.ToInt32(command.ExecuteScalar());
-                    int segundo = primero + 1;
-                    return (primero, segundo);
+                    try
+                    {
+                        // Obtener el máximo número actual
+                        string sqlMax = "SELECT IFNULL(MAX(NumeroTalonario), 0) FROM Recetario";
+                        int maxActual;
+                        
+                        using (var command = new SQLiteCommand(sqlMax, connection, transaction))
+                        {
+                            maxActual = Convert.ToInt32(command.ExecuteScalar());
+                        }
+                        
+                        // Calcular los dos números consecutivos
+                        int primero = maxActual + 1;
+                        int segundo = maxActual + 2;
+                        
+                        transaction.Commit();
+                        return (primero, segundo);
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
                 }
             }
+        }
+
+        // Método para obtener números adicionales de talonario de manera segura
+        public List<int> ObtenerNumerosAdicionales(int cantidad)
+        {
+            var numeros = new List<int>();
+            
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var transaction = connection.BeginTransaction())
+                {
+                    try
+                    {
+                        // Obtener el máximo número actual
+                        string sqlMax = "SELECT IFNULL(MAX(NumeroTalonario), 0) FROM Recetario";
+                        int maxActual;
+                        
+                        using (var command = new SQLiteCommand(sqlMax, connection, transaction))
+                        {
+                            maxActual = Convert.ToInt32(command.ExecuteScalar());
+                        }
+                        
+                        // Generar números consecutivos empezando desde el siguiente al máximo
+                        for (int i = 1; i <= cantidad; i++)
+                        {
+                            numeros.Add(maxActual + i);
+                        }
+                        
+                        transaction.Commit();
+                    }
+                    catch
+                    {
+                        transaction.Rollback();
+                        throw;
+                    }
+                }
+            }
+            
+            return numeros;
         }
 
         // MÉTODOS SELECT (CONSULTAS)

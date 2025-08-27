@@ -3,6 +3,7 @@ using System.Windows.Forms;
 using System.Collections.Generic;
 using Centro_Empleado.Data;
 using Centro_Empleado.Models;
+using System.Linq; // Added for .Select()
 
 namespace Centro_Empleado
 {
@@ -49,11 +50,8 @@ namespace Centro_Empleado
             {
                 var recetarios = dbManager.ObtenerRecetariosPorAfiliado(a.Id);
                 DateTime? ultima = recetarios.Count > 0 ? (DateTime?)recetarios[0].FechaEmision : null;
-                DateTime? proxima = null;
-                if (ultima.HasValue)
-                {
-                    proxima = ultima.Value.AddMonths(1);
-                }
+                DateTime? proxima = dbManager.FechaProximaHabilitacion(a.Id);
+                
                 lista.Add(new
                 {
                     a.Id,
@@ -76,7 +74,7 @@ namespace Centro_Empleado
             if (dgvAfiliados.Columns.Contains("FechaUltimaImpresion"))
                 dgvAfiliados.Columns["FechaUltimaImpresion"].HeaderText = "Última impresión";
             if (dgvAfiliados.Columns.Contains("ProximaHabilitacion"))
-                dgvAfiliados.Columns["ProximaHabilitacion"].HeaderText = "Próxima impresión";
+                dgvAfiliados.Columns["ProximaHabilitacion"].HeaderText = "Próxima habilitación (30 días)";
             if (dgvAfiliados.Columns.Contains("TieneFamiliar"))
             {
                 dgvAfiliados.Columns["TieneFamiliar"].HeaderText = "Tiene familiar";
@@ -278,64 +276,85 @@ namespace Centro_Empleado
             // Control de recetarios mensuales
             int maxRecetarios = afiliado.TieneGrupoFamiliar ? 4 : 2;
             int recetariosEsteMes = dbManager.ContarRecetariosMensuales(afiliado.Id, DateTime.Now);
+            
             if (recetariosEsteMes >= maxRecetarios)
             {
                 DateTime? proxima = dbManager.FechaProximaHabilitacion(afiliado.Id);
                 string fechaProx = proxima.HasValue ? proxima.Value.ToString("dd/MM/yyyy") : "-";
-                MessageBox.Show($"Ya imprimió las recetas correspondientes al mes. Podrá imprimir nuevamente a partir del: {fechaProx}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                MessageBox.Show($"Ya imprimió las recetas correspondientes al período. Podrá imprimir nuevamente a partir del: {fechaProx}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            var confirm = MessageBox.Show($"¿Desea imprimir las recetas del afiliado {afiliado.ApellidoNombre}?", "Confirmar impresión", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            // Calcular cuántos recetarios imprimir
+            int recetariosAImprimir = maxRecetarios - recetariosEsteMes;
+            
+            // Solo permitir imprimir si hay recetas disponibles
+            if (recetariosAImprimir <= 0)
+            {
+                DateTime? proxima = dbManager.FechaProximaHabilitacion(afiliado.Id);
+                string fechaProx = proxima.HasValue ? proxima.Value.ToString("dd/MM/yyyy") : "-";
+                MessageBox.Show($"Ya imprimió las recetas correspondientes al período. Podrá imprimir nuevamente a partir del: {fechaProx}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            
+            // Para grupos familiares, imprimir 4 recetas (2 hojas) de una vez
+            // Para afiliados sin grupo familiar, imprimir 2 recetas (1 hoja) de una vez
+            if (afiliado.TieneGrupoFamiliar)
+            {
+                recetariosAImprimir = 4; // Siempre imprimir 4 recetas para grupos familiares
+            }
+            else
+            {
+                recetariosAImprimir = 2; // Siempre imprimir 2 recetas para afiliados individuales
+            }
+
+            var confirm = MessageBox.Show($"¿Desea imprimir {recetariosAImprimir} recetas del afiliado {afiliado.ApellidoNombre}?", "Confirmar impresión", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (confirm == DialogResult.Yes)
             {
-                // Lógica de impresión: generar los recetarios y registrar en la base
-                int aImprimir = maxRecetarios - recetariosEsteMes;
-                if (aImprimir > 2) aImprimir = 2; // Solo se imprimen 2 por vez
-                var numeros = dbManager.ObtenerDosNumerosConsecutivos();
-                var recetariosGenerados = new List<Models.Recetario>();
-                for (int i = 0; i < aImprimir; i++)
-                {
-                    int nro = (i == 0) ? numeros.primero : numeros.segundo;
-                    var recetario = new Models.Recetario
-                    {
-                        NumeroTalonario = nro,
-                        IdAfiliado = afiliado.Id,
-                        FechaEmision = DateTime.Now,
-                        FechaVencimiento = DateTime.Now.AddMonths(1)
-                    };
-                    dbManager.InsertarRecetario(recetario);
-                    recetariosGenerados.Add(recetario);
-                }
-                MessageBox.Show($"Recetarios generados correctamente. Se imprimieron {aImprimir} recetarios.", "Impresión", MessageBoxButtons.OK, MessageBoxIcon.Information);
-
-                // Generar HTML personalizado y abrirlo para imprimir
                 try
                 {
-                    string templatePath = System.IO.Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "recetaFinal.html");
-                    if (!System.IO.File.Exists(templatePath))
+                    // Generar todos los recetarios necesarios
+                    var recetariosGenerados = new List<Models.Recetario>();
+                    
+                    // Obtener todos los números necesarios de una vez
+                    List<int> numerosTalonario;
+                    if (recetariosAImprimir <= 2)
                     {
-                        MessageBox.Show("No se encontró la plantilla HTML de receta.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                        return;
+                        var numeros = dbManager.ObtenerDosNumerosConsecutivos();
+                        numerosTalonario = new List<int> { numeros.primero, numeros.segundo };
                     }
-                    foreach (var recetario in recetariosGenerados)
+                    else
                     {
-                        string html = System.IO.File.ReadAllText(templatePath);
-                        // Reemplazo seguro de todos los placeholders
-                        html = html.Replace("{{APELLIDO_NOMBRE}}", System.Net.WebUtility.HtmlEncode(afiliado.ApellidoNombre ?? ""));
-                        html = html.Replace("{{DNI}}", System.Net.WebUtility.HtmlEncode(afiliado.DNI ?? ""));
-                        html = html.Replace("{{EMPRESA}}", System.Net.WebUtility.HtmlEncode(afiliado.Empresa ?? ""));
-                        html = html.Replace("{{FECHA_EMISION}}", recetario.FechaEmision.ToString("dd/MM/yyyy"));
-                        html = html.Replace("{{FECHA_VENCIMIENTO}}", recetario.FechaVencimiento.ToString("dd/MM/yyyy"));
-                        html = html.Replace("{{NUMERO_TALONARIO}}", recetario.NumeroTalonario.ToString());
-                        string tempFile = System.IO.Path.Combine(System.IO.Path.GetTempPath(), $"receta_{afiliado.Id}_{recetario.NumeroTalonario}_{DateTime.Now.Ticks}.html");
-                        System.IO.File.WriteAllText(tempFile, html);
-                        System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(tempFile) { UseShellExecute = true });
+                        // Para 4 recetarios, obtener 4 números consecutivos
+                        numerosTalonario = dbManager.ObtenerNumerosAdicionales(4);
                     }
+                    
+                    for (int i = 0; i < recetariosAImprimir; i++)
+                    {
+                        var recetario = new Models.Recetario
+                        {
+                            NumeroTalonario = numerosTalonario[i],
+                            IdAfiliado = afiliado.Id,
+                            FechaEmision = DateTime.Now,
+                            FechaVencimiento = DateTime.Now.AddMonths(1)
+                        };
+                        
+                        dbManager.InsertarRecetario(recetario);
+                        recetariosGenerados.Add(recetario);
+                    }
+
+                    // Generar HTML con todas las recetas
+                    var recetarioManager = new RecetarioManager();
+                    recetarioManager.GenerarHTMLConRecetas(recetariosGenerados, afiliado);
+                    
+                    MessageBox.Show($"Se generaron {recetariosAImprimir} recetarios correctamente.", "Impresión exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                    
+                    // Recargar la lista de afiliados para mostrar la información actualizada
+                    CargarAfiliados();
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al generar o abrir el archivo HTML: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show($"Error al generar los recetarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }
         }

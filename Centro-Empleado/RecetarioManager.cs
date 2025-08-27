@@ -2,7 +2,12 @@ using System.Drawing;
 using System.Drawing.Printing;
 using System.Windows.Forms;
 using Centro_Empleado.Models;
-
+using System.Collections.Generic;
+using System.IO;
+using System.Net;
+using System.Diagnostics;
+using System;
+using System.Linq; // Added for .Select()
 
 namespace Centro_Empleado
 {
@@ -18,6 +23,168 @@ namespace Centro_Empleado
             preview.Width = 1000;
             preview.Height = 700;
             preview.ShowDialog(parent);
+        }
+
+        // Nuevo método para generar HTML con múltiples recetas
+        public void GenerarHTMLConRecetas(List<Recetario> recetarios, Afiliado afiliado)
+        {
+            try
+            {
+                string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "recetaFinal.html");
+                if (!File.Exists(templatePath))
+                {
+                    throw new FileNotFoundException("No se encontró la plantilla HTML de receta.");
+                }
+
+                string templateHtml = File.ReadAllText(templatePath);
+                string htmlFinal = "";
+
+                // Procesar recetarios en pares (2 por página)
+                for (int i = 0; i < recetarios.Count; i += 2)
+                {
+                    // Crear una copia del template para esta página
+                    string htmlPagina = templateHtml;
+                    
+                    // Primera receta de la página
+                    var recetario1 = recetarios[i];
+                    htmlPagina = ReemplazarPlaceholdersPrimeraReceta(htmlPagina, recetario1, afiliado);
+                    
+                    // Segunda receta de la página (si existe)
+                    if (i + 1 < recetarios.Count)
+                    {
+                        var recetario2 = recetarios[i + 1];
+                        htmlPagina = ReemplazarPlaceholdersSegundaReceta(htmlPagina, recetario2, afiliado);
+                    }
+                    else
+                    {
+                        // Si no hay segunda receta, limpiar el segundo formulario
+                        htmlPagina = LimpiarSegundoFormulario(htmlPagina);
+                    }
+                    
+                    // Corregir la ruta del logo para que sea relativa
+                    htmlPagina = CorregirRutaLogo(htmlPagina);
+                    
+                    htmlFinal += htmlPagina;
+                    
+                    // Agregar salto de página si no es la última página
+                    if (i + 2 < recetarios.Count)
+                    {
+                        htmlFinal += "<div style='page-break-before: always;'></div>";
+                    }
+                }
+
+                // Guardar y abrir el archivo HTML
+                string tempFile = Path.Combine(Path.GetTempPath(), $"recetas_{afiliado.Id}_{DateTime.Now.Ticks}.html");
+                File.WriteAllText(tempFile, htmlFinal);
+                Process.Start(new ProcessStartInfo(tempFile) { UseShellExecute = true });
+            }
+            catch (Exception ex)
+            {
+                throw new Exception($"Error al generar el archivo HTML: {ex.Message}", ex);
+            }
+        }
+
+        private string ReemplazarPlaceholdersPrimeraReceta(string html, Recetario recetario, Afiliado afiliado)
+        {
+            // Reemplazar placeholders de la primera receta (sin sufijo)
+            html = html.Replace("{{NUMERO_TALONARIO}}", recetario.NumeroTalonario.ToString("D6"));
+            html = html.Replace("{{DNI}}", WebUtility.HtmlEncode(afiliado.DNI ?? ""));
+            html = html.Replace("{{FECHA_EMISION}}", recetario.FechaEmision.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{FECHA_VENCIMIENTO}}", recetario.FechaVencimiento.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{APELLIDO_NOMBRE}}", WebUtility.HtmlEncode(afiliado.ApellidoNombre ?? ""));
+            html = html.Replace("{{EMPRESA}}", WebUtility.HtmlEncode(afiliado.Empresa ?? ""));
+            
+            return html;
+        }
+
+        private string ReemplazarPlaceholdersSegundaReceta(string html, Recetario recetario, Afiliado afiliado)
+        {
+            // Reemplazar placeholders de la segunda receta (con sufijo SEGUNDO)
+            html = html.Replace("{{NUMERO_TALONARIO_SEGUNDO}}", recetario.NumeroTalonario.ToString("D6"));
+            html = html.Replace("{{DNI_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.DNI ?? ""));
+            html = html.Replace("{{FECHA_EMISION_SEGUNDO}}", recetario.FechaEmision.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{FECHA_VENCIMIENTO_SEGUNDO}}", recetario.FechaVencimiento.ToString("dd/MM/yyyy"));
+            html = html.Replace("{{APELLIDO_NOMBRE_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.ApellidoNombre ?? ""));
+            html = html.Replace("{{EMPRESA_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.Empresa ?? ""));
+            
+            return html;
+        }
+
+        private string LimpiarSegundoFormulario(string html)
+        {
+            // Limpiar los placeholders del segundo formulario si no hay segunda receta
+            string[] placeholders = {
+                "{{NUMERO_TALONARIO_SEGUNDO}}", "{{DNI_SEGUNDO}}", "{{FECHA_EMISION_SEGUNDO}}", 
+                "{{FECHA_VENCIMIENTO_SEGUNDO}}", "{{APELLIDO_NOMBRE_SEGUNDO}}", "{{EMPRESA_SEGUNDO}}"
+            };
+            
+            foreach (string placeholder in placeholders)
+            {
+                html = html.Replace(placeholder, "");
+            }
+            
+            return html;
+        }
+
+        private string CorregirRutaLogo(string html)
+        {
+            // Buscar el logo en diferentes ubicaciones posibles
+            string[] posiblesRutas = {
+                "logo_cec1.png",
+                "logo_cec.png",
+                "Resources/logo_cec1.png",
+                "Resources/logo_cec.png"
+            };
+
+            string logoPath = "";
+            string rutaCompleta = "";
+            
+            foreach (string ruta in posiblesRutas)
+            {
+                rutaCompleta = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, ruta);
+                if (File.Exists(rutaCompleta))
+                {
+                    logoPath = ruta;
+                    break;
+                }
+            }
+
+            // Si no se encuentra el logo, usar un placeholder
+            if (string.IsNullOrEmpty(logoPath))
+            {
+                // Reemplazar la imagen del logo con texto "CEC" estilizado
+                html = html.Replace("<img src=\"logo_cec1.png\" alt=\"Logo\" style=\"width: 40px; height: 40px; object-fit: contain;\">", 
+                                   "<div style=\"width: 40px; height: 40px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; background-color: #f0f0f0;\">CEC</div>");
+                
+                // También reemplazar en el segundo formulario si existe
+                html = html.Replace("<img src=\"logo_cec1.png\" alt=\"Logo\" style=\"width: 40px; height: 40px; object-fit: contain;\">", 
+                                   "<div style=\"width: 40px; height: 40px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; background-color: #f0f0f0;\">CEC</div>");
+            }
+            else
+            {
+                // Copiar el logo al directorio temporal para que sea accesible desde el HTML
+                string tempDir = Path.GetTempPath();
+                string tempLogoPath = Path.Combine(tempDir, Path.GetFileName(logoPath));
+                
+                try
+                {
+                    if (!File.Exists(tempLogoPath))
+                    {
+                        File.Copy(rutaCompleta, tempLogoPath, true);
+                    }
+                    
+                    // Usar la ruta temporal del logo
+                    html = html.Replace("logo_cec1.png", Path.GetFileName(tempLogoPath));
+                }
+                catch
+                {
+                    // Si no se puede copiar, usar el placeholder
+                    html = html.Replace("<img src=\"logo_cec1.png\" alt=\"Logo\" style=\"width: 40px; height: 40px; object-fit: contain;\">", 
+                                       "<div style=\"width: 40px; height: 40px; border: 1px solid #000; display: flex; align-items: center; justify-content: center; font-weight: bold; font-size: 12px; background-color: #f0f0f0;\">CEC</div>");
+                }
+            }
+
+            return html;
         }
 
         private void DibujarRecetario(Graphics g, Recetario recetario, Afiliado afiliado)
