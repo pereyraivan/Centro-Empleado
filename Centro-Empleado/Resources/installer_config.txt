@@ -1,0 +1,35 @@
+CONFIGURACIÓN DEL INSTALADOR PARA SQLite
+==========================================
+
+ARCHIVOS A INCLUIR EN EL INSTALADOR:
+1. CentroEmpleado.exe (aplicación principal)
+2. CentroEmpleado.exe.config (configuración)
+3. System.Data.SQLite.dll (motor SQLite)
+4. System.Data.SQLite.EF6.dll (Entity Framework para SQLite)
+5. System.Data.SQLite.Linq.dll (LINQ para SQLite)
+6. System.Data.SQLite.Core.dll (núcleo SQLite)
+7. create_database.sql (script de creación automática)
+
+CARPETA DE DESTINO:
+- La aplicación se instalará en: C:\Program Files\Centro-Empleado\
+- La base de datos se creará automáticamente en: C:\Program Files\Centro-Empleado\CentroEmpleado.db
+
+CONFIGURACIÓN AUTOMÁTICA:
+- Al ejecutar la aplicación por primera vez, se creará automáticamente:
+  * El archivo de base de datos CentroEmpleado.db
+  * Las tablas: Afiliado, Familiar, Recetario
+  * Los índices para optimizar el rendimiento
+
+VENTAJAS DE SQLite:
+✓ No requiere instalación de servidor
+✓ Base de datos ligera y portable
+✓ Se incluye en el instalador
+✓ Creación automática de tablas
+✓ No requiere configuración adicional
+✓ Funciona en cualquier Windows sin dependencias externas
+
+NOTAS IMPORTANTES:
+- La base de datos se crea automáticamente al primer uso
+- No se requiere configuración manual del usuario
+- Los datos se almacenan localmente en la máquina del usuario
+- Backup automático: copiar el archivo .db

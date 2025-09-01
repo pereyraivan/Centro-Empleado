@@ -64,6 +64,7 @@
     <Reference Include="System.Net.Http" />
     <Reference Include="System.Windows.Forms" />
     <Reference Include="System.Xml" />
+    <Reference Include="Microsoft.VisualBasic" />
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Data\DatabaseManager.cs" />
@@ -73,7 +74,26 @@
     <Compile Include="frmAfiliado.Designer.cs">
       <DependentUpon>frmAfiliado.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmPruebas.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmPruebas.Designer.cs">
+      <DependentUpon>frmPruebas.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmBono.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmBono.Designer.cs">
+      <DependentUpon>frmBono.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmControlCaja.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmControlCaja.Designer.cs">
+      <DependentUpon>frmControlCaja.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Afiliado.cs" />
+    <Compile Include="Models\Bono.cs" />
     <Compile Include="Models\Familiar.cs" />
     <Compile Include="Models\Recetario.cs" />
     <Compile Include="RecetarioManager.cs" />
@@ -83,6 +103,18 @@
     <EmbeddedResource Include="frmAfiliado.resx">
       <DependentUpon>frmAfiliado.cs</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frmPruebas.resx">
+      <DependentUpon>frmPruebas.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmBono.resx">
+      <DependentUpon>frmBono.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmControlCaja.resx">
+      <DependentUpon>frmControlCaja.cs</DependentUpon>
+    </EmbeddedResource>
+    <Content Include="Resources\bonoFinal.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
@@ -110,7 +142,9 @@
   <ItemGroup>
     <Content Include="logo_cec.png" />
     <None Include="Resources\logo_cec.png" />
-    <None Include="Resources\logo_cec1.png" />
+    <Content Include="Resources\logo_cec1.png">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Resources\logo_placeholder.txt" />
     <Content Include="Resources\recetaFinal.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>

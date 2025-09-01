@@ -1,6 +1,8 @@
 using System;
 using System.Windows.Forms;
 using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
 using Centro_Empleado.Data;
 using Centro_Empleado.Models;
 using System.Linq; // Added for .Select()
@@ -34,6 +36,56 @@ namespace Centro_Empleado
             dgvAfiliados.SelectionChanged += dgvAfiliados_SelectionChanged;
             txtBuscar.TextChanged += txtBuscar_TextChanged;
             dgvAfiliados.DataBindingComplete += dgvAfiliados_DataBindingComplete;
+            
+            // Agregar eventos para el panel de operaciones
+            btnOperaciones.Click += BtnOperaciones_Click;
+            btnVerCaja.Click += BtnVerCaja_Click;
+            btnImprimirCupon.Click += BtnImprimirCupon_Click;
+            btnManual.Click += BtnManual_Click;
+            
+            // Agregar evento para abrir herramientas de pruebas (Ctrl+P)
+            this.KeyPreview = true;
+            this.KeyDown += FrmAfiliado_KeyDown;
+            
+            // Agregar evento para abrir bonos (Ctrl+B)
+            this.KeyDown += FrmAfiliado_KeyDown;
+        }
+
+        private void FrmAfiliado_KeyDown(object sender, KeyEventArgs e)
+        {
+            // Abrir herramientas de pruebas con Ctrl+P
+            if (e.Control && e.KeyCode == Keys.P)
+            {
+                var frmPruebas = new frmPruebas();
+                frmPruebas.ShowDialog();
+            }
+            
+            // Abrir bonos de cobro con Ctrl+B
+            if (e.Control && e.KeyCode == Keys.B)
+            {
+                var frmBono = new frmBono();
+                frmBono.ShowDialog();
+            }
+            
+            // Abrir control de caja con Ctrl+C
+            if (e.Control && e.KeyCode == Keys.C)
+            {
+                var frmControlCaja = new frmControlCaja();
+                frmControlCaja.ShowDialog();
+            }
+            
+            // Recargar datos con F5
+            if (e.KeyCode == Keys.F5)
+            {
+                CargarAfiliados(txtBuscar.Text);
+                MessageBox.Show("Datos recargados desde la base de datos", "Recarga completada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            
+            // COMBINACIÓN SECRETA: Limpiar base de datos con Ctrl+Shift+L
+            if (e.Control && e.Shift && e.KeyCode == Keys.L)
+            {
+                LimpiarBaseDatosSecreta();
+            }
         }
 
         private void CargarAfiliados(string filtro = "")
@@ -134,23 +186,61 @@ namespace Centro_Empleado
         private void btnEliminar_Click(object sender, EventArgs e)
         {
             if (afiliadoSeleccionadoId == null) return;
-            var result = MessageBox.Show("¿Está seguro que desea eliminar el afiliado seleccionado?", "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
+            
+            // Obtener información del afiliado para mostrar en la confirmación
+            var afiliado = dbManager.ObtenerTodosLosAfiliados().Find(a => a.Id == afiliadoSeleccionadoId.Value);
+            if (afiliado == null) return;
+            
+            // Verificar si tiene recetarios
+            var recetarios = dbManager.ObtenerRecetariosPorAfiliado(afiliadoSeleccionadoId.Value);
+            bool tieneRecetarios = recetarios.Count > 0;
+            
+            // Crear mensaje de confirmación
+            string mensaje = $"¿Está seguro que desea eliminar al afiliado:\n\n";
+            mensaje += $"Nombre: {afiliado.ApellidoNombre}\n";
+            mensaje += $"DNI: {afiliado.DNI}\n";
+            mensaje += $"Empresa: {afiliado.Empresa}\n";
+            mensaje += $"Tipo: {(afiliado.TieneGrupoFamiliar ? "Grupo Familiar" : "Individual")}\n\n";
+            
+            if (tieneRecetarios)
+            {
+                mensaje += $"⚠️ ADVERTENCIA: Este afiliado tiene {recetarios.Count} recetario(s) impreso(s).\n";
+                mensaje += $"Al eliminarlo, se eliminarán TODOS los recetarios asociados.\n\n";
+            }
+            
+            mensaje += "Esta acción NO se puede deshacer. ¿Desea continuar?";
+            
+            var result = MessageBox.Show(mensaje, "Confirmar eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
             if (result == DialogResult.Yes)
             {
-                if (dbManager.EliminarAfiliado(afiliadoSeleccionadoId.Value))
-                {
-                    MessageBox.Show("Afiliado eliminado correctamente", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    LimpiarFormulario();
-                    CargarAfiliados(txtBuscar.Text);
-                    btnEditar.Enabled = false;
-                    btnEliminar.Enabled = false;
-                    btnImprimir.Enabled = false;
-                    afiliadoSeleccionadoId = null;
-                }
-                else
-                {
-                    MessageBox.Show("No se pudo eliminar el afiliado. Puede que tenga recetarios emitidos.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                }
+                                 try
+                 {
+                     if (dbManager.EliminarAfiliado(afiliadoSeleccionadoId.Value))
+                     {
+                         string mensajeExito = "Afiliado eliminado correctamente";
+                         if (tieneRecetarios)
+                         {
+                             mensajeExito += $" junto con {recetarios.Count} recetario(s)";
+                         }
+                         mensajeExito += ".";
+                         
+                         MessageBox.Show(mensajeExito, "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                         LimpiarFormulario();
+                         CargarAfiliados(txtBuscar.Text);
+                         btnEditar.Enabled = false;
+                         btnEliminar.Enabled = false;
+                         btnImprimir.Enabled = false;
+                         afiliadoSeleccionadoId = null;
+                     }
+                     else
+                     {
+                         MessageBox.Show("No se pudo eliminar el afiliado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                     }
+                 }
+                 catch (Exception ex)
+                 {
+                     MessageBox.Show($"Error al eliminar afiliado: {ex.Message}\n\nDetalles técnicos: {ex.InnerException?.Message ?? "Sin detalles adicionales"}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                 }
             }
         }
 
@@ -267,6 +357,135 @@ namespace Centro_Empleado
             // Aumentar tamaño de letra de las filas
             dgvAfiliados.DefaultCellStyle.Font = new System.Drawing.Font(dgvAfiliados.Font.FontFamily, dgvAfiliados.Font.Size + 1);
         }
+
+        // ========================================
+        // MÉTODOS PARA EL PANEL DE OPERACIONES
+        // ========================================
+
+        private void BtnOperaciones_Click(object sender, EventArgs e)
+        {
+            // Alternar la visibilidad del panel de operaciones
+            panelOperaciones.Visible = !panelOperaciones.Visible;
+            
+            // Cambiar el texto del botón según el estado
+            if (panelOperaciones.Visible)
+            {
+                btnOperaciones.Text = "▼ Operaciones";
+            }
+            else
+            {
+                btnOperaciones.Text = "▶ Operaciones";
+            }
+        }
+
+        private void BtnVerCaja_Click(object sender, EventArgs e)
+        {
+            // Ocultar el panel de operaciones
+            panelOperaciones.Visible = false;
+            btnOperaciones.Text = "▶ Operaciones";
+            
+            // Abrir el control de caja
+            var frmControlCaja = new frmControlCaja();
+            frmControlCaja.ShowDialog();
+        }
+
+        private void BtnImprimirCupon_Click(object sender, EventArgs e)
+        {
+            // Ocultar el panel de operaciones
+            panelOperaciones.Visible = false;
+            btnOperaciones.Text = "▶ Operaciones";
+            
+            // Abrir el formulario de bonos
+            var frmBono = new frmBono();
+            frmBono.ShowDialog();
+        }
+
+        private void BtnManual_Click(object sender, EventArgs e)
+        {
+            try
+            {
+                // Ocultar el panel de operaciones
+                panelOperaciones.Visible = false;
+                btnOperaciones.Text = "▶ Operaciones";
+                
+                // Ruta del manual HTML
+                string manualPath = Path.Combine(Application.StartupPath, "Manual_Usuario.html");
+                
+                if (!File.Exists(manualPath))
+                {
+                    MessageBox.Show("No se encontró el archivo del manual de usuario.\n\n" +
+                        "El manual se abrirá en el navegador para que pueda imprimirlo como PDF.", 
+                        "Manual no encontrado", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Abrir el manual en el navegador predeterminado
+                Process.Start(new ProcessStartInfo(manualPath) { UseShellExecute = true });
+                
+                MessageBox.Show("El manual se ha abierto en el navegador.\n\n" +
+                    "Para descargar como PDF:\n" +
+                    "1. Presione Ctrl+P en el navegador\n" +
+                    "2. Seleccione 'Guardar como PDF'\n" +
+                    "3. Elija la ubicación y guarde", 
+                    "Manual abierto", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al abrir el manual: {ex.Message}", 
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        // ========================================
+        // FUNCIÓN SECRETA PARA LIMPIAR BASE DE DATOS
+        // ========================================
+        
+        private void LimpiarBaseDatosSecreta()
+        {
+            try
+            {
+                // Confirmar la acción con mensaje más técnico
+                var result = MessageBox.Show(
+                    "🔧 FUNCIÓN DE DESARROLLO\n\n" +
+                    "Esta función eliminará TODOS los datos de la base de datos:\n" +
+                    "• Afiliados\n" +
+                    "• Recetarios\n" +
+                    "• Bonos\n" +
+                    "• Familiares\n\n" +
+                    "Se mantendrá la estructura de las tablas.\n" +
+                    "Esta acción es IRREVERSIBLE.\n\n" +
+                    "¿Desea continuar con la limpieza?",
+                    "Función de Desarrollo - Limpiar Base de Datos",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Warning);
+
+                if (result == DialogResult.Yes)
+                {
+                    // Ejecutar limpieza
+                    string mensaje = dbManager.LimpiarBaseDatos();
+                    
+                    MessageBox.Show(
+                        $"✅ LIMPIEZA COMPLETADA\n\n" +
+                        $"{mensaje}\n\n" +
+                        "La base de datos está lista para crear el instalador.",
+                        "Limpieza de Base de Datos",
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Information);
+                    
+                    // Recargar la lista de afiliados
+                    CargarAfiliados();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(
+                    $"❌ ERROR EN LA LIMPIEZA\n\n" +
+                    $"Detalles: {ex.Message}",
+                    "Error de Limpieza",
+                    MessageBoxButtons.OK,
+                    MessageBoxIcon.Error);
+            }
+        }
         private void btnImprimir_Click(object sender, EventArgs e)
         {
             if (afiliadoSeleccionadoId == null) return;
@@ -297,18 +516,18 @@ namespace Centro_Empleado
                 return;
             }
             
-            // Para grupos familiares, imprimir 4 recetas (2 hojas) de una vez
-            // Para afiliados sin grupo familiar, imprimir 2 recetas (1 hoja) de una vez
-            if (afiliado.TieneGrupoFamiliar)
-            {
-                recetariosAImprimir = 4; // Siempre imprimir 4 recetas para grupos familiares
-            }
-            else
-            {
-                recetariosAImprimir = 2; // Siempre imprimir 2 recetas para afiliados individuales
-            }
+            // Siempre imprimir 2 recetas por impresión (1 hoja)
+            // Para grupos familiares, quedan 2 pendientes para otra impresión
+            recetariosAImprimir = 2; // Siempre imprimir 2 recetas por impresión
 
-            var confirm = MessageBox.Show($"¿Desea imprimir {recetariosAImprimir} recetas del afiliado {afiliado.ApellidoNombre}?", "Confirmar impresión", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
+            string mensajeConfirmacion = $"¿Desea imprimir {recetariosAImprimir} recetas del afiliado {afiliado.ApellidoNombre}?";
+            
+            if (afiliado.TieneGrupoFamiliar && recetariosEsteMes == 0)
+            {
+                mensajeConfirmacion += "\n\nNota: Al ser grupo familiar, quedará 1 impresión adicional disponible (2 recetas más).";
+            }
+            
+            var confirm = MessageBox.Show(mensajeConfirmacion, "Confirmar impresión", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
             if (confirm == DialogResult.Yes)
             {
                 try
@@ -316,18 +535,9 @@ namespace Centro_Empleado
                     // Generar todos los recetarios necesarios
                     var recetariosGenerados = new List<Models.Recetario>();
                     
-                    // Obtener todos los números necesarios de una vez
-                    List<int> numerosTalonario;
-                    if (recetariosAImprimir <= 2)
-                    {
-                        var numeros = dbManager.ObtenerDosNumerosConsecutivos();
-                        numerosTalonario = new List<int> { numeros.primero, numeros.segundo };
-                    }
-                    else
-                    {
-                        // Para 4 recetarios, obtener 4 números consecutivos
-                        numerosTalonario = dbManager.ObtenerNumerosAdicionales(4);
-                    }
+                    // Obtener 2 números consecutivos para la impresión
+                    var numeros = dbManager.ObtenerDosNumerosConsecutivos();
+                    List<int> numerosTalonario = new List<int> { numeros.primero, numeros.segundo };
                     
                     for (int i = 0; i < recetariosAImprimir; i++)
                     {

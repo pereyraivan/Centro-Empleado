@@ -1,0 +1,48 @@
+LISTA COMPLETA DE ARCHIVOS PARA EL INSTALADOR
+===============================================
+
+ARCHIVOS OBLIGATORIOS (COPIA DIRECTA):
+---------------------------------------
+1. Centro-Empleado.exe                    # Aplicación principal
+2. CentroEmpleado.exe.config              # Configuración de la aplicación
+3. logo_cec.png                           # Logo de la aplicación
+4. logo_cec1.png                          # Logo alternativo
+
+ARCHIVOS SQLite (COPIA DESDE packages):
+----------------------------------------
+5. System.Data.SQLite.dll                 # Motor SQLite principal
+6. System.Data.SQLite.EF6.dll             # Entity Framework para SQLite
+7. System.Data.SQLite.Core.dll            # Núcleo SQLite
+8. System.Data.SQLite.Linq.dll            # LINQ para SQLite
+
+ARCHIVOS DE CONFIGURACIÓN:
+--------------------------
+9. create_database.sql                    # Script de creación automática
+10. setup_database.bat                    # Script de verificación
+11. README_INSTALADOR.md                  # Documentación completa
+12. installer_config.txt                  # Configuración del instalador
+
+ARCHIVOS DE RECURSOS:
+---------------------
+13. recetaFinal.html                      # Template de receta
+14. template_recetario.html               # Template alternativo
+
+CARPETA DE DESTINO RECOMENDADA:
+C:\Program Files\Centro-Empleado\
+
+PERMISOS REQUERIDOS:
+- Instalación: Administrador
+- Ejecución: Usuario normal
+- Base de datos: Se crea automáticamente
+
+NOTAS IMPORTANTES:
+- La base de datos se crea automáticamente al primer uso
+- No se requiere configuración manual
+- Todos los archivos SQLite deben estar en la misma carpeta
+- La aplicación funciona inmediatamente después de la instalación
+
+VERIFICACIÓN POST-INSTALACIÓN:
+1. Ejecutar setup_database.bat
+2. Verificar que todos los archivos estén presentes
+3. Ejecutar Centro-Empleado.exe como administrador la primera vez
+4. Confirmar que se crea CentroEmpleado.db automáticamente

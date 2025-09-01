@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset='utf-8'>
+    <title>Bono de Cobro</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 10px;
+            background-color: white;
+            font-size: 10px;
+        }
+
+        .bono-container {
+            max-width: 95%;
+            margin: 0 auto;
+            border: 2px solid #000;
+            padding: 10px;
+            background-color: white;
+            page-break-inside: avoid;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 8px;
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            flex: 1;
+        }
+
+        .logo {
+            width: 35px;
+            height: 35px;
+            margin-right: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .institucion {
+            font-size: 11px;
+            font-weight: bold;
+            line-height: 1.1;
+            margin-bottom: 2px;
+        }
+
+        .contacto {
+            font-size: 8px;
+            color: #333;
+            line-height: 1.1;
+        }
+
+        .header-right {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .titulo {
+            font-size: 14px;
+            font-weight: bold;
+            text-align: center;
+            margin: 0;
+        }
+
+        .numero-bono {
+            font-size: 11px;
+            font-weight: bold;
+            text-align: center;
+            margin: 0;
+        }
+
+        .fecha {
+            font-size: 9px;
+            text-align: center;
+            margin: 0;
+        }
+
+        .seccion {
+            margin-bottom: 10px;
+        }
+
+        .seccion-titulo {
+            font-weight: bold;
+            font-size: 12px;
+            margin-bottom: 8px;
+            border-bottom: 1px solid #000;
+            padding-bottom: 2px;
+        }
+
+        .campo {
+            margin-bottom: 8px;
+        }
+
+        .campo-label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 2px;
+            font-size: 10px;
+        }
+
+        .campo-valor {
+            border: 1px solid #000;
+            padding: 4px;
+            min-height: 14px;
+            background-color: white;
+        }
+
+        .campo-grande {
+            min-height: 25px;
+        }
+
+        .campos-horizontales {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 10px;
+            align-items: flex-start;
+        }
+
+        .campo-horizontal {
+            flex: 1;
+        }
+
+            .campo-horizontal .campo-label {
+                margin-bottom: 2px;
+            }
+
+            .campo-horizontal .campo-valor {
+                height: 20px;
+            }
+
+        .tabla {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 12px;
+        }
+
+            .tabla th, .tabla td {
+                border: 1px solid #000;
+                padding: 4px;
+                text-align: center;
+                font-size: 10px;
+            }
+
+            .tabla th {
+                background-color: #f0f0f0;
+                font-weight: bold;
+            }
+
+                    .tabla tr {
+            height: 20px;
+        }
+
+        .columna-cantidad {
+            width: 10%;
+        }
+
+        .columna-codigo {
+            width: 15%;
+        }
+
+        .columna-practica {
+            width: 55%;
+        }
+
+        .columna-coseguro {
+            width: 20%;
+        }
+
+        .firma {
+            margin-top: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+
+        .firma-campo {
+            text-align: center;
+            width: 45%;
+        }
+
+        .firma-linea {
+            border-bottom: 1px solid #000;
+            height: 15px;
+            margin-top: 3px;
+        }
+
+        @media print {
+            body {
+                margin: 5px;
+                font-size: 9px;
+            }
+
+            .bono-container {
+                border: 2px solid #000;
+                max-width: 95%;
+                padding: 8px;
+            }
+
+            .header {
+                margin-bottom: 8px;
+                padding-bottom: 6px;
+            }
+
+            .seccion {
+                margin-bottom: 8px;
+            }
+
+            .campo {
+                margin-bottom: 6px;
+            }
+
+            .campo-grande {
+                min-height: 20px;
+            }
+
+            .tabla tr {
+                height: 18px;
+            }
+
+            .firma {
+                margin-top: 12px;
+            }
+
+            .firma-linea {
+                height: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class='bono-container'>
+        <div class='header'>
+            <div class='header-left'>
+                <div class='logo'><img src="logo_cec1.png" alt="Logo" style="width: 35px; height: 35px; object-fit: contain;"></div>
+                <div>
+                    <div class='institucion'>
+                        CENTRO EMPLEADOS<br>
+                        DE COMERCIO DE<br>
+                        CONCEPCIÓN - AGUILARES
+                    </div>
+                    <div class='contacto'>
+                        Manuela Pedraza 520 Tel. (03865)421716<br>
+                        (4146) Concepción - Tucumán
+                    </div>
+                </div>
+            </div>
+            <div class='header-right'>
+                <div class='titulo'>ORDEN DE CONSULTA</div>
+                <div class='numero-bono'>N°: {NUMERO_BONO}</div>
+                <div class='fecha'>Fecha: {FECHA}</div>
+            </div>
+        </div>
+
+        <div class='seccion'>
+            <div class='campo'>
+                <div class='campo-label'>Apellido y Nombre del Beneficiario:</div>
+                <div class='campo-valor campo-grande'>{APELLIDO_NOMBRE}</div>
+            </div>
+            <div class='campo'>
+                <div class='campo-label'>Domicilio:</div>
+                <div class='campo-valor campo-grande'>Concepción - Tucumán</div>
+            </div>
+            <div class='campos-horizontales'>
+                <div class='campo-horizontal'>
+                    <div class='campo-label'>D.N.I N°:</div>
+                    <div class='campo-valor'>{DNI}</div>
+                </div>
+                <div class='campo-horizontal'>
+                    <div class='campo-label'>SEXO:</div>
+                    <div class='campo-valor'>-</div>
+                </div>
+                <div class='campo-horizontal'>
+                    <div class='campo-label'>EDAD:</div>
+                    <div class='campo-valor'>-</div>
+                </div>
+            </div>
+        </div>
+
+        <div class='seccion'>
+            <table class='tabla'>
+                <thead>
+                    <tr>
+                        <th class='columna-cantidad'>CANT.</th>
+                        <th class='columna-codigo'>CÓDIGO</th>
+                        <th class='columna-practica'>PRÁCTICA INDICADA</th>
+                        <th class='columna-coseguro'>COSEGURO</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td>{CONCEPTO}</td>
+                        <td>$ {MONTO}</td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                    <tr>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                        <td></td>
+                    </tr>
+                </tbody>
+            </table>
+            <div style='text-align: right; margin-top: 8px; font-weight: bold;'>
+                TOTAL: $ {MONTO}
+            </div>
+        </div>
+
+        <div class='seccion'>
+            <div class='campo'>
+                <div class='campo-label'>DIAGNÓSTICO:</div>
+                <div class='campo-valor campo-grande'></div>
+            </div>
+            <div class='campos-horizontales'>
+                <div class='campo-horizontal'>
+                    <div class='campo-label'>TIPO DE ATENCIÓN:</div>
+                    <div class='campo-valor'></div>
+                </div>
+                <div class='campo-horizontal'>
+                    <div class='campo-label'>TIPO DE PLAN:</div>
+                    <div class='campo-valor'></div>
+                </div>
+            </div>
+        </div>
+
+        <div class='firma'>
+            <div class='firma-campo'>
+                <div style='font-size: 10px; font-weight: bold;'>FIRMA Y SELLO DEL MÉDICO</div>
+                <div class='firma-linea'></div>
+            </div>
+            <div class='firma-campo'>
+                <div style='font-size: 10px; font-weight: bold;'>FIRMA DEL BENEFICIARIO</div>
+                <div class='firma-linea'></div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

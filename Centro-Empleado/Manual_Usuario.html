@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Manual de Usuario - Centro de Empleados de Comercio</title>
+    <style>
+        @page {
+            size: A4;
+            margin: 2cm;
+        }
+        
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            font-size: 12px;
+            color: #333;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            border-bottom: 3px solid #2c3e50;
+            padding-bottom: 20px;
+        }
+        
+        .header h1 {
+            color: #2c3e50;
+            font-size: 24px;
+            margin: 0;
+        }
+        
+        .header p {
+            color: #7f8c8d;
+            margin: 5px 0;
+        }
+        
+        .toc {
+            background-color: #f8f9fa;
+            padding: 20px;
+            border-radius: 5px;
+            margin-bottom: 30px;
+            border-left: 4px solid #3498db;
+        }
+        
+        .toc h2 {
+            color: #2c3e50;
+            margin-top: 0;
+            font-size: 18px;
+        }
+        
+        .toc ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .toc li {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .toc a {
+            text-decoration: none;
+            color: #3498db;
+            font-weight: bold;
+        }
+        
+        h2 {
+            color: #34495e;
+            border-bottom: 2px solid #bdc3c7;
+            padding-bottom: 10px;
+            margin-top: 40px;
+            font-size: 18px;
+        }
+        
+        h3 {
+            color: #7f8c8d;
+            margin-top: 25px;
+            font-size: 16px;
+        }
+        
+        h4 {
+            color: #95a5a6;
+            margin-top: 20px;
+            font-size: 14px;
+        }
+        
+        .feature-list {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
+        
+        .feature-list ul {
+            margin: 0;
+            padding-left: 20px;
+        }
+        
+        .feature-list li {
+            margin: 5px 0;
+        }
+        
+        .step-list {
+            counter-reset: step-counter;
+            list-style-type: none;
+            padding-left: 0;
+        }
+        
+        .step-list li {
+            counter-increment: step-counter;
+            margin: 10px 0;
+            padding-left: 30px;
+            position: relative;
+        }
+        
+        .step-list li::before {
+            content: counter(step-counter);
+            background-color: #3498db;
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+        
+        .warning {
+            background-color: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-left: 4px solid #f39c12;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .info {
+            background-color: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-left: 4px solid #17a2b8;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        .success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-left: 4px solid #28a745;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            font-size: 11px;
+        }
+        
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        
+        th {
+            background-color: #f2f2f2;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        
+        .contact-info {
+            background-color: #ecf0f1;
+            padding: 20px;
+            border-radius: 5px;
+            margin-top: 30px;
+            text-align: center;
+        }
+        
+        .contact-info h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        
+        .page-break {
+            page-break-before: always;
+        }
+        
+        .highlight {
+            background-color: #fff3cd;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-weight: bold;
+        }
+        
+        .code {
+            background-color: #f8f9fa;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            border: 1px solid #e9ecef;
+        }
+        
+        hr {
+            border: none;
+            border-top: 1px solid #ddd;
+            margin: 30px 0;
+        }
+        
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #ddd;
+            color: #7f8c8d;
+            font-size: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>Manual de Usuario</h1>
+        <p><strong>Centro de Empleados de Comercio de Concepción - Aguileres</strong></p>
+        <p>Manuela Pedraza 520, Concepción - Tucumán</p>
+        <p>Tel: (03865) 421716 - Código Postal: (4146)</p>
+    </div>
+
+    <div class="toc">
+        <h2>📋 Índice</h2>
+        <ul>
+            <li><a href="#introduccion">1. Introducción</a></li>
+            <li><a href="#instalacion">2. Instalación</a></li>
+            <li><a href="#funcionalidades">3. Funcionalidades Principales</a></li>
+            <li><a href="#afiliados">4. Gestión de Afiliados</a></li>
+            <li><a href="#recetas">5. Impresión de Recetas</a></li>
+            <li><a href="#bonos">6. Sistema de Bonos</a></li>
+            <li><a href="#caja">7. Control de Caja</a></li>
+            <li><a href="#pruebas">8. Casos de Prueba</a></li>
+            <li><a href="#problemas">9. Solución de Problemas</a></li>
+        </ul>
+    </div>
+
+    <div id="introduccion">
+        <h2>1. Introducción</h2>
+        <p>El Sistema Centro de Empleados de Comercio es una aplicación desarrollada para gestionar afiliados, imprimir recetas médicas y controlar bonos de cobro para atención médica.</p>
+        
+        <div class="feature-list">
+            <h3>✅ Características Principales</h3>
+            <ul>
+                                   <li><strong>Gestión completa de afiliados</strong> - Agregar, editar, buscar y eliminar afiliados</li>
+                   <li><strong>Impresión de recetas médicas</strong> - 2 recetas por afiliado individual, 4 por grupo familiar</li>
+                <li><strong>Sistema de bonos de cobro</strong> - Generación de órdenes de consulta</li>
+                <li><strong>Control de caja diaria</strong> - Seguimiento de ingresos por bonos</li>
+                <li><strong>Base de datos SQLite integrada</strong> - Sin necesidad de servidor</li>
+                <li><strong>Interfaz intuitiva y fácil de usar</strong> - Diseño moderno y responsive</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="instalacion" class="page-break">
+        <h2>2. Instalación</h2>
+        
+        <h3>Requisitos del Sistema</h3>
+        <ul>
+            <li>Windows 7 o superior</li>
+            <li>.NET Framework 4.7.2 o superior</li>
+            <li>100 MB de espacio en disco</li>
+            <li>Impresora configurada</li>
+        </ul>
+
+        <h3>Pasos de Instalación</h3>
+        <ol class="step-list">
+            <li>Ejecutar el archivo <span class="code">Centro-Empleado-Setup.exe</span></li>
+            <li>Seguir las instrucciones del asistente de instalación</li>
+            <li>Seleccionar la carpeta de destino</li>
+            <li>Completar la instalación</li>
+            <li>Ejecutar la aplicación desde el menú Inicio</li>
+        </ol>
+
+        <div class="info">
+            <strong>💡 Nota:</strong> La aplicación se instala automáticamente con todos los archivos necesarios, incluyendo la base de datos SQLite.
+        </div>
+    </div>
+
+    <div id="funcionalidades">
+        <h2>3. Funcionalidades Principales</h2>
+        
+        <h3>Panel de Operaciones</h3>
+        <p>El sistema incluye un panel de operaciones con las siguientes opciones:</p>
+        
+        <table>
+            <tr>
+                <th>Función</th>
+                <th>Descripción</th>
+                <th>Acceso</th>
+            </tr>
+            <tr>
+                <td><strong>🔍 Ver Caja</strong></td>
+                <td>Visualizar el control de caja diaria y exportar datos</td>
+                <td>Panel Operaciones → Ver Caja</td>
+            </tr>
+            <tr>
+                <td><strong>🖨️ Imprimir Cupón</strong></td>
+                <td>Generar bonos de cobro para atención médica</td>
+                <td>Panel Operaciones → Imprimir Cupón</td>
+            </tr>
+            <tr>
+                <td><strong>📖 Manual</strong></td>
+                <td>Descargar el manual de usuario en PDF</td>
+                <td>Panel Operaciones → Manual</td>
+            </tr>
+        </table>
+    </div>
+
+    <div id="afiliados" class="page-break">
+        <h2>4. Gestión de Afiliados</h2>
+        
+        <h3>Agregar Nuevo Afiliado</h3>
+        <ol class="step-list">
+            <li>Hacer clic en <span class="highlight">"Nuevo Afiliado"</span></li>
+            <li>Completar los campos obligatorios:
+                <ul>
+                    <li><strong>DNI:</strong> Número de documento (obligatorio)</li>
+                    <li><strong>Apellido y Nombre:</strong> Nombre completo del afiliado</li>
+                    <li><strong>Empresa:</strong> Empresa donde trabaja</li>
+                </ul>
+            </li>
+            <li>Hacer clic en <span class="highlight">"Guardar"</span></li>
+        </ol>
+
+        <h3>Buscar Afiliado</h3>
+        <ol class="step-list">
+            <li>Ingresar el DNI en el campo de búsqueda</li>
+            <li>Hacer clic en <span class="highlight">"Buscar"</span></li>
+            <li>Los datos del afiliado se cargarán automáticamente</li>
+        </ol>
+
+        <h3>Editar Afiliado</h3>
+        <ol class="step-list">
+            <li>Buscar el afiliado por DNI</li>
+            <li>Modificar los campos necesarios</li>
+            <li>Hacer clic en <span class="highlight">"Guardar"</span></li>
+        </ol>
+
+        <h3>Eliminar Afiliado</h3>
+        <ol class="step-list">
+            <li>Buscar el afiliado por DNI</li>
+            <li>Hacer clic en <span class="highlight">"Eliminar"</span></li>
+            <li>Confirmar la eliminación</li>
+        </ol>
+
+        <div class="warning">
+            <strong>⚠️ Advertencia:</strong> Al eliminar un afiliado, se eliminarán también todos sus registros de recetas y bonos asociados.
+        </div>
+    </div>
+
+    <div id="recetas">
+        <h2>5. Impresión de Recetas</h2>
+        
+        <h3>Generar Receta Mensual</h3>
+        <ol class="step-list">
+            <li>Buscar el afiliado por DNI</li>
+            <li>Verificar que el afiliado esté habilitado para imprimir</li>
+            <li>Hacer clic en <span class="highlight">"Imprimir Receta"</span></li>
+            <li>La receta se abrirá en el navegador predeterminado</li>
+            <li>Imprimir desde el navegador</li>
+        </ol>
+
+                       <h3>Límite Mensual</h3>
+               <div class="info">
+                   <ul>
+                       <li><strong>Afiliado individual:</strong> Puede imprimir <strong>2 recetas por mes</strong></li>
+                       <li><strong>Grupo familiar:</strong> Puede imprimir <strong>4 recetas por mes</strong></li>
+                       <li>El sistema controla automáticamente el límite</li>
+                       <li>Se habilita nuevamente después de <strong>30 días desde la última impresión</strong></li>
+                   </ul>
+               </div>
+
+        <h3>Formato de Receta</h3>
+        <p>La receta incluye:</p>
+        <ul>
+            <li>Logo de la institución</li>
+            <li>Datos del afiliado</li>
+            <li>Número de receta único</li>
+            <li>Fecha de emisión y vencimiento</li>
+            <li>Espacios para medicamentos y cantidades</li>
+        </ul>
+    </div>
+
+    <div id="bonos" class="page-break">
+        <h2>6. Sistema de Bonos</h2>
+        
+        <h3>Generar Bono de Cobro</h3>
+        <ol class="step-list">
+            <li>Hacer clic en <span class="highlight">"Imprimir Cupón"</span> en el panel de operaciones</li>
+            <li>Ingresar el DNI del afiliado</li>
+            <li>Hacer clic en <span class="highlight">"Buscar"</span></li>
+            <li>Completar los campos:
+                <ul>
+                    <li><strong>Monto:</strong> Cantidad a cobrar (obligatorio)</li>
+                    <li><strong>Concepto:</strong> Descripción del servicio</li>
+                    <li><strong>Observaciones:</strong> Notas adicionales</li>
+                </ul>
+            </li>
+            <li>Hacer clic en <span class="highlight">"Imprimir Bono"</span></li>
+        </ol>
+
+        <h3>Formato del Bono</h3>
+        <p>El bono incluye:</p>
+        <ul>
+            <li>Logo de la institución</li>
+            <li>Número de orden único</li>
+            <li>Datos del beneficiario</li>
+            <li>Detalle del servicio y monto</li>
+            <li>Espacios para firma del médico y beneficiario</li>
+        </ul>
+
+        <h3>Numeración Automática</h3>
+        <div class="success">
+            <ul>
+                <li>Los bonos se numeran automáticamente (BON-000001, BON-000002, etc.)</li>
+                <li>Cada bono tiene un número único</li>
+                <li>Se registra en la base de datos para control</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="caja">
+        <h2>7. Control de Caja</h2>
+        
+        <h3>Ver Caja Diaria</h3>
+        <ol class="step-list">
+            <li>Hacer clic en <span class="highlight">"Ver Caja"</span> en el panel de operaciones</li>
+            <li>Seleccionar rango de fechas</li>
+            <li>Hacer clic en <span class="highlight">"Buscar"</span></li>
+        </ol>
+
+        <h3>Información Mostrada</h3>
+        <table>
+            <tr>
+                <th>Campo</th>
+                <th>Descripción</th>
+            </tr>
+            <tr>
+                <td><strong>Fecha</strong></td>
+                <td>Fecha de emisión del bono</td>
+            </tr>
+            <tr>
+                <td><strong>Número de Bono</strong></td>
+                <td>Identificador único del bono</td>
+            </tr>
+            <tr>
+                <td><strong>Afiliado</strong></td>
+                <td>Nombre del beneficiario</td>
+            </tr>
+            <tr>
+                <td><strong>DNI</strong></td>
+                <td>Documento del afiliado</td>
+            </tr>
+            <tr>
+                <td><strong>Monto</strong></td>
+                <td>Cantidad cobrada</td>
+            </tr>
+            <tr>
+                <td><strong>Concepto</strong></td>
+                <td>Descripción del servicio</td>
+            </tr>
+        </table>
+
+        <h3>Exportar Datos</h3>
+        <ol class="step-list">
+            <li>Hacer clic en <span class="highlight">"Exportar a CSV"</span></li>
+            <li>Seleccionar ubicación para guardar el archivo</li>
+            <li>El archivo se puede abrir en Excel</li>
+        </ol>
+    </div>
+
+    <div id="pruebas" class="page-break">
+        <h2>8. Casos de Prueba</h2>
+        
+                       <h3>Prueba de Receta Mensual</h3>
+               <ol class="step-list">
+                   <li><strong>Crear afiliado de prueba:</strong>
+                       <ul>
+                           <li>DNI: 12345678</li>
+                           <li>Nombre: Juan Pérez</li>
+                           <li>Empresa: Empresa Test</li>
+                       </ul>
+                   </li>
+                   <li><strong>Imprimir primera receta:</strong>
+                       <ul>
+                           <li>Buscar por DNI: 12345678</li>
+                           <li>Imprimir receta (se imprimen 2 recetas en 1 hoja)</li>
+                           <li>Verificar que se genere correctamente</li>
+                       </ul>
+                   </li>
+                   <li><strong>Verificar límite para afiliado individual:</strong>
+                       <ul>
+                           <li>Intentar imprimir otra receta</li>
+                           <li>Verificar que el sistema no permita imprimir más</li>
+                       </ul>
+                   </li>
+                   <li><strong>Probar grupo familiar:</strong>
+                       <ul>
+                           <li>Editar el afiliado y marcar "Tiene grupo familiar"</li>
+                           <li>Verificar que pueda imprimir 4 recetas (2 hojas)</li>
+                       </ul>
+                   </li>
+                   <li><strong>Esperar 30 días:</strong>
+                       <ul>
+                           <li>Cambiar la fecha del sistema para simular 30 días transcurridos</li>
+                           <li>Verificar que se pueda imprimir nuevamente</li>
+                       </ul>
+                   </li>
+               </ol>
+
+        <h3>Prueba de Bono</h3>
+        <ol class="step-list">
+            <li><strong>Generar bono:</strong>
+                <ul>
+                    <li>Buscar afiliado por DNI</li>
+                    <li>Ingresar monto: $1000</li>
+                    <li>Concepto: Consulta médica</li>
+                    <li>Imprimir bono</li>
+                </ul>
+            </li>
+            <li><strong>Verificar en caja:</strong>
+                <ul>
+                    <li>Ir a "Ver Caja"</li>
+                    <li>Buscar por fecha actual</li>
+                    <li>Verificar que aparezca el bono generado</li>
+                </ul>
+            </li>
+        </ol>
+    </div>
+
+    <div id="problemas">
+        <h2>9. Solución de Problemas</h2>
+        
+        <h3>Problema: No se muestra el logo</h3>
+        <div class="warning">
+            <strong>Solución:</strong>
+            <ul>
+                <li>Verificar que el archivo <span class="code">logo_cec1.png</span> esté en la carpeta de la aplicación</li>
+                <li>Reiniciar la aplicación</li>
+            </ul>
+        </div>
+
+        <h3>Problema: Error al imprimir</h3>
+        <div class="warning">
+            <strong>Solución:</strong>
+            <ul>
+                <li>Verificar que la impresora esté conectada y encendida</li>
+                <li>Verificar que el navegador predeterminado esté configurado</li>
+                <li>Intentar imprimir desde el navegador manualmente</li>
+            </ul>
+        </div>
+
+        <h3>Problema: No encuentra afiliado</h3>
+        <div class="warning">
+            <strong>Solución:</strong>
+            <ul>
+                <li>Verificar que el DNI esté ingresado correctamente</li>
+                <li>Verificar que el afiliado exista en la base de datos</li>
+                <li>Intentar agregar el afiliado si no existe</li>
+            </ul>
+        </div>
+
+        <h3>Problema: Error de base de datos</h3>
+        <div class="warning">
+            <strong>Solución:</strong>
+            <ul>
+                <li>Verificar que la aplicación tenga permisos de escritura</li>
+                <li>Verificar que no haya otro proceso usando la base de datos</li>
+                <li>Reiniciar la aplicación</li>
+            </ul>
+        </div>
+
+        <h3>Problema: No se puede generar bono</h3>
+        <div class="warning">
+            <strong>Solución:</strong>
+            <ul>
+                <li>Verificar que el afiliado exista</li>
+                <li>Verificar que el monto sea mayor a 0</li>
+                <li>Verificar que todos los campos obligatorios estén completos</li>
+            </ul>
+        </div>
+
+        <h3>Atajos de Teclado</h3>
+        <table>
+            <tr>
+                <th>Función</th>
+                <th>Atajo</th>
+            </tr>
+            <tr>
+                <td>Abrir formulario de bonos</td>
+                <td><span class="code">Ctrl + B</span></td>
+            </tr>
+            <tr>
+                <td>Abrir control de caja</td>
+                <td><span class="code">Ctrl + C</span></td>
+            </tr>
+            <tr>
+                <td>Buscar afiliado</td>
+                <td><span class="code">Enter</span> (en campo DNI)</td>
+            </tr>
+            <tr>
+                <td>Guardar afiliado</td>
+                <td><span class="code">Ctrl + S</span></td>
+            </tr>
+            <tr>
+                <td>Imprimir receta</td>
+                <td><span class="code">Ctrl + P</span></td>
+            </tr>
+        </table>
+    </div>
+
+    <div class="contact-info">
+        <h3>📞 Contacto y Soporte</h3>
+        <p><strong>Para soporte técnico o consultas:</strong></p>
+        <p><strong>Institución:</strong> Centro de Empleados de Comercio de Concepción - Aguileres</p>
+        <p><strong>Dirección:</strong> Manuela Pedraza 520, Concepción - Tucumán</p>
+        <p><strong>Teléfono:</strong> (03865) 421716</p>
+        <p><strong>Código Postal:</strong> (4146)</p>
+    </div>
+
+    <div class="footer">
+        <p><strong>Manual de Usuario v1.0 - Centro de Empleados de Comercio</strong></p>
+        <p>© 2024 Centro de Empleados de Comercio de Concepción - Aguileres</p>
+    </div>
+</body>
+</html>
