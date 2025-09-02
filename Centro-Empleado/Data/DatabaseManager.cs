@@ -16,12 +16,24 @@ namespace Centro_Empleado.Data
         {
             try
             {
+                // Verificar que existe la cadena de conexión
+                if (ConfigurationManager.ConnectionStrings["CentroEmpleadoDB"] == null)
+                {
+                    throw new Exception("No se encontró la cadena de conexión 'CentroEmpleadoDB' en el archivo de configuración");
+                }
+                
                 connectionString = ConfigurationManager.ConnectionStrings["CentroEmpleadoDB"].ConnectionString;
+                
+                if (string.IsNullOrEmpty(connectionString))
+                {
+                    throw new Exception("La cadena de conexión 'CentroEmpleadoDB' está vacía");
+                }
+                
                 InitializeDatabase();
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al inicializar la base de datos: {ex.Message}");
+                throw new Exception($"Error al inicializar la base de datos: {ex.Message}\n\nDetalles: {ex.ToString()}");
             }
         }
 
@@ -105,22 +117,26 @@ namespace Centro_Empleado.Data
 
         private void InitializeDatabase()
         {
-            // FORZAR USO DE UNA ÚNICA BASE DE DATOS EN LA CARPETA DEL PROYECTO
-            string dbPath = Path.Combine(Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location), "CentroEmpleado.db");
-            
-            // Crear la base de datos si no existe
-            bool nuevaBaseDatos = !File.Exists(dbPath);
-            
-            if (nuevaBaseDatos)
+            try
             {
-                SQLiteConnection.CreateFile(dbPath);
+                // Extraer la ruta de la base de datos de la cadena de conexión
+                string dbPath = connectionString.Split(';')[0].Split('=')[1].Trim();
+                
+                // Crear la base de datos si no existe
+                bool nuevaBaseDatos = !File.Exists(dbPath);
+                
+                if (nuevaBaseDatos)
+                {
+                    SQLiteConnection.CreateFile(dbPath);
+                }
+                
+                // Siempre intentar crear las tablas (si ya existen, no hace nada por el CREATE TABLE IF NOT EXISTS)
+                CreateTables();
             }
-            
-            // Actualizar la cadena de conexión para usar la ruta absoluta
-            connectionString = $"Data Source={dbPath};Version=3;";
-            
-            // Siempre intentar crear las tablas (si ya existen, no hace nada por el CREATE TABLE IF NOT EXISTS)
-            CreateTables();
+            catch (Exception ex)
+            {
+                throw new Exception($"Error en InitializeDatabase: {ex.Message}\n\nCadena de conexión: {connectionString}\n\nDetalles: {ex.ToString()}");
+            }
         }
 
         private void CreateTables()

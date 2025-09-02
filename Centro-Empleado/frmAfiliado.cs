@@ -17,13 +17,22 @@ namespace Centro_Empleado
 
         public frmAfiliado()
         {
-            InitializeComponent();
-            dbManager = new DatabaseManager();
-            InicializarEventos();
-            CargarAfiliados();
-            btnEditar.Enabled = false;
-            btnEliminar.Enabled = false;
-            btnImprimir.Enabled = false;
+            try
+            {
+                InitializeComponent();
+                dbManager = new DatabaseManager();
+                InicializarEventos();
+                CargarAfiliados();
+                btnEditar.Enabled = false;
+                btnEliminar.Enabled = false;
+                btnImprimir.Enabled = false;
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al inicializar el formulario:\n\n{ex.Message}\n\nDetalles:\n{ex.ToString()}", 
+                    "Error de Inicialización", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                throw; // Re-lanzar para que Program.cs lo capture
+            }
         }
 
         private void InicializarEventos()

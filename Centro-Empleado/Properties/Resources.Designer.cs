@@ -81,6 +81,16 @@ namespace Centro_Empleado.Properties {
         }
         
         /// <summary>
+        ///   Looks up a localized resource of type System.Drawing.Icon similar to (Icon).
+        /// </summary>
+        internal static System.Drawing.Icon logo_cec11 {
+            get {
+                object obj = ResourceManager.GetObject("logo_cec11", resourceCulture);
+                return ((System.Drawing.Icon)(obj));
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to &lt;!DOCTYPE html&gt;
         ///&lt;html lang=&quot;es&quot;&gt;
         ///&lt;head&gt;

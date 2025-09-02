@@ -14,9 +14,17 @@ namespace Centro_Empleado
         [STAThread]
         static void Main()
         {
-            Application.EnableVisualStyles();
-            Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new frmAfiliado());
+            try
+            {
+                Application.EnableVisualStyles();
+                Application.SetCompatibleTextRenderingDefault(false);
+                Application.Run(new frmAfiliado());
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error al iniciar la aplicación:\n\n{ex.Message}\n\nDetalles:\n{ex.ToString()}", 
+                    "Error de Inicio", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }
