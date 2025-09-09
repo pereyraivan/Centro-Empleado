@@ -34,6 +34,8 @@ namespace Centro_Empleado
             this.txtApellidoNombre = new System.Windows.Forms.TextBox();
             this.lblDNI = new System.Windows.Forms.Label();
             this.txtDNI = new System.Windows.Forms.TextBox();
+            this.lblNumeroAfiliado = new System.Windows.Forms.Label();
+            this.txtNumeroAfiliado = new System.Windows.Forms.TextBox();
             this.lblEmpresa = new System.Windows.Forms.Label();
             this.txtEmpresa = new System.Windows.Forms.TextBox();
             this.chkGrupoFamiliar = new System.Windows.Forms.CheckBox();
@@ -48,6 +50,8 @@ namespace Centro_Empleado
             this.label1 = new System.Windows.Forms.Label();
             this.btnOperaciones = new System.Windows.Forms.Button();
             this.panelOperaciones = new System.Windows.Forms.Panel();
+            this.btnHistorialExtraordinarias = new System.Windows.Forms.Button();
+            this.btnRecetaExtraordinaria = new System.Windows.Forms.Button();
             this.btnManual = new System.Windows.Forms.Button();
             this.btnImprimirCupon = new System.Windows.Forms.Button();
             this.btnVerCaja = new System.Windows.Forms.Button();
@@ -60,7 +64,7 @@ namespace Centro_Empleado
             // 
             this.lblApellidoNombre.AutoSize = true;
             this.lblApellidoNombre.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblApellidoNombre.Location = new System.Drawing.Point(44, 173);
+            this.lblApellidoNombre.Location = new System.Drawing.Point(45, 173);
             this.lblApellidoNombre.Name = "lblApellidoNombre";
             this.lblApellidoNombre.Size = new System.Drawing.Size(177, 25);
             this.lblApellidoNombre.TabIndex = 0;
@@ -79,7 +83,7 @@ namespace Centro_Empleado
             // 
             this.lblDNI.AutoSize = true;
             this.lblDNI.Font = new System.Drawing.Font("Microsoft Sans Serif", 10.8F);
-            this.lblDNI.Location = new System.Drawing.Point(44, 254);
+            this.lblDNI.Location = new System.Drawing.Point(45, 258);
             this.lblDNI.Name = "lblDNI";
             this.lblDNI.Size = new System.Drawing.Size(45, 22);
             this.lblDNI.TabIndex = 2;
@@ -88,17 +92,37 @@ namespace Centro_Empleado
             // txtDNI
             // 
             this.txtDNI.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtDNI.Location = new System.Drawing.Point(44, 280);
+            this.txtDNI.Location = new System.Drawing.Point(44, 283);
             this.txtDNI.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtDNI.Name = "txtDNI";
             this.txtDNI.Size = new System.Drawing.Size(249, 30);
             this.txtDNI.TabIndex = 3;
+            this.txtDNI.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtDNI_KeyPress);
+            // 
+            // lblNumeroAfiliado
+            // 
+            this.lblNumeroAfiliado.AutoSize = true;
+            this.lblNumeroAfiliado.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.lblNumeroAfiliado.Location = new System.Drawing.Point(44, 335);
+            this.lblNumeroAfiliado.Name = "lblNumeroAfiliado";
+            this.lblNumeroAfiliado.Size = new System.Drawing.Size(156, 25);
+            this.lblNumeroAfiliado.TabIndex = 5;
+            this.lblNumeroAfiliado.Text = "Número Afiliado:";
+            // 
+            // txtNumeroAfiliado
+            // 
+            this.txtNumeroAfiliado.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.txtNumeroAfiliado.Location = new System.Drawing.Point(44, 364);
+            this.txtNumeroAfiliado.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
+            this.txtNumeroAfiliado.Name = "txtNumeroAfiliado";
+            this.txtNumeroAfiliado.Size = new System.Drawing.Size(249, 30);
+            this.txtNumeroAfiliado.TabIndex = 4;
             // 
             // lblEmpresa
             // 
             this.lblEmpresa.AutoSize = true;
             this.lblEmpresa.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.lblEmpresa.Location = new System.Drawing.Point(44, 329);
+            this.lblEmpresa.Location = new System.Drawing.Point(44, 417);
             this.lblEmpresa.Name = "lblEmpresa";
             this.lblEmpresa.Size = new System.Drawing.Size(96, 25);
             this.lblEmpresa.TabIndex = 4;
@@ -107,7 +131,7 @@ namespace Centro_Empleado
             // txtEmpresa
             // 
             this.txtEmpresa.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.txtEmpresa.Location = new System.Drawing.Point(44, 358);
+            this.txtEmpresa.Location = new System.Drawing.Point(44, 445);
             this.txtEmpresa.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.txtEmpresa.Name = "txtEmpresa";
             this.txtEmpresa.Size = new System.Drawing.Size(471, 30);
@@ -117,7 +141,7 @@ namespace Centro_Empleado
             // 
             this.chkGrupoFamiliar.AutoSize = true;
             this.chkGrupoFamiliar.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.chkGrupoFamiliar.Location = new System.Drawing.Point(44, 414);
+            this.chkGrupoFamiliar.Location = new System.Drawing.Point(44, 503);
             this.chkGrupoFamiliar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.chkGrupoFamiliar.Name = "chkGrupoFamiliar";
             this.chkGrupoFamiliar.Size = new System.Drawing.Size(216, 29);
@@ -127,6 +151,7 @@ namespace Centro_Empleado
             // 
             // btnGuardar
             // 
+            this.btnGuardar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnGuardar.BackColor = System.Drawing.Color.White;
             this.btnGuardar.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnGuardar.ForeColor = System.Drawing.SystemColors.ActiveCaptionText;
@@ -140,6 +165,8 @@ namespace Centro_Empleado
             // 
             // txtBuscar
             // 
+            this.txtBuscar.Anchor = ((System.Windows.Forms.AnchorStyles)(((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.txtBuscar.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.txtBuscar.Location = new System.Drawing.Point(677, 90);
             this.txtBuscar.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
@@ -161,6 +188,9 @@ namespace Centro_Empleado
             // 
             this.dgvAfiliados.AllowUserToAddRows = false;
             this.dgvAfiliados.AllowUserToDeleteRows = false;
+            this.dgvAfiliados.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
+            | System.Windows.Forms.AnchorStyles.Left) 
+            | System.Windows.Forms.AnchorStyles.Right)));
             this.dgvAfiliados.AutoSizeColumnsMode = System.Windows.Forms.DataGridViewAutoSizeColumnsMode.Fill;
             this.dgvAfiliados.BackgroundColor = System.Drawing.Color.White;
             this.dgvAfiliados.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
@@ -194,6 +224,7 @@ namespace Centro_Empleado
             // 
             // btnImprimir
             // 
+            this.btnImprimir.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
             this.btnImprimir.BackColor = System.Drawing.Color.Azure;
             this.btnImprimir.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnImprimir.Location = new System.Drawing.Point(1234, 81);
@@ -206,6 +237,7 @@ namespace Centro_Empleado
             // 
             // btnEditar
             // 
+            this.btnEditar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Left)));
             this.btnEditar.BackColor = System.Drawing.Color.White;
             this.btnEditar.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnEditar.Location = new System.Drawing.Point(310, 662);
@@ -218,6 +250,7 @@ namespace Centro_Empleado
             // 
             // btnEliminar
             // 
+            this.btnEliminar.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Bottom | System.Windows.Forms.AnchorStyles.Right)));
             this.btnEliminar.BackColor = System.Drawing.Color.LightCoral;
             this.btnEliminar.Font = new System.Drawing.Font("Microsoft Sans Serif", 13.8F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnEliminar.Location = new System.Drawing.Point(1215, 662);
@@ -241,6 +274,7 @@ namespace Centro_Empleado
             // 
             // label1
             // 
+            this.label1.Anchor = System.Windows.Forms.AnchorStyles.Top;
             this.label1.AutoSize = true;
             this.label1.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.label1.Location = new System.Drawing.Point(383, 9);
@@ -265,14 +299,40 @@ namespace Centro_Empleado
             // 
             this.panelOperaciones.BackColor = System.Drawing.Color.WhiteSmoke;
             this.panelOperaciones.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
+            this.panelOperaciones.Controls.Add(this.btnHistorialExtraordinarias);
+            this.panelOperaciones.Controls.Add(this.btnRecetaExtraordinaria);
             this.panelOperaciones.Controls.Add(this.btnManual);
             this.panelOperaciones.Controls.Add(this.btnImprimirCupon);
             this.panelOperaciones.Controls.Add(this.btnVerCaja);
             this.panelOperaciones.Location = new System.Drawing.Point(4, 43);
             this.panelOperaciones.Name = "panelOperaciones";
-            this.panelOperaciones.Size = new System.Drawing.Size(190, 102);
+            this.panelOperaciones.Size = new System.Drawing.Size(218, 169);
             this.panelOperaciones.TabIndex = 16;
             this.panelOperaciones.Visible = false;
+            // 
+            // btnHistorialExtraordinarias
+            // 
+            this.btnHistorialExtraordinarias.BackColor = System.Drawing.Color.MediumTurquoise;
+            this.btnHistorialExtraordinarias.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnHistorialExtraordinarias.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnHistorialExtraordinarias.Location = new System.Drawing.Point(5, 129);
+            this.btnHistorialExtraordinarias.Name = "btnHistorialExtraordinarias";
+            this.btnHistorialExtraordinarias.Size = new System.Drawing.Size(208, 30);
+            this.btnHistorialExtraordinarias.TabIndex = 4;
+            this.btnHistorialExtraordinarias.Text = "📋 Historial Extraordinarias";
+            this.btnHistorialExtraordinarias.UseVisualStyleBackColor = false;
+            // 
+            // btnRecetaExtraordinaria
+            // 
+            this.btnRecetaExtraordinaria.BackColor = System.Drawing.Color.Orange;
+            this.btnRecetaExtraordinaria.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRecetaExtraordinaria.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRecetaExtraordinaria.Location = new System.Drawing.Point(5, 98);
+            this.btnRecetaExtraordinaria.Name = "btnRecetaExtraordinaria";
+            this.btnRecetaExtraordinaria.Size = new System.Drawing.Size(208, 30);
+            this.btnRecetaExtraordinaria.TabIndex = 3;
+            this.btnRecetaExtraordinaria.Text = "⚠️ Receta Extraordinaria";
+            this.btnRecetaExtraordinaria.UseVisualStyleBackColor = false;
             // 
             // btnManual
             // 
@@ -281,12 +341,10 @@ namespace Centro_Empleado
             this.btnManual.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnManual.Location = new System.Drawing.Point(5, 67);
             this.btnManual.Name = "btnManual";
-            this.btnManual.Size = new System.Drawing.Size(180, 30);
+            this.btnManual.Size = new System.Drawing.Size(208, 30);
             this.btnManual.TabIndex = 2;
             this.btnManual.Text = "📖 Manual";
             this.btnManual.UseVisualStyleBackColor = false;
-            
-
             // 
             // btnImprimirCupon
             // 
@@ -295,7 +353,7 @@ namespace Centro_Empleado
             this.btnImprimirCupon.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnImprimirCupon.Location = new System.Drawing.Point(5, 36);
             this.btnImprimirCupon.Name = "btnImprimirCupon";
-            this.btnImprimirCupon.Size = new System.Drawing.Size(180, 30);
+            this.btnImprimirCupon.Size = new System.Drawing.Size(208, 30);
             this.btnImprimirCupon.TabIndex = 1;
             this.btnImprimirCupon.Text = "🏥 Imprimir Bono";
             this.btnImprimirCupon.UseVisualStyleBackColor = false;
@@ -307,7 +365,7 @@ namespace Centro_Empleado
             this.btnVerCaja.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnVerCaja.Location = new System.Drawing.Point(5, 5);
             this.btnVerCaja.Name = "btnVerCaja";
-            this.btnVerCaja.Size = new System.Drawing.Size(180, 30);
+            this.btnVerCaja.Size = new System.Drawing.Size(208, 30);
             this.btnVerCaja.TabIndex = 0;
             this.btnVerCaja.Text = "💰 Ver Caja";
             this.btnVerCaja.UseVisualStyleBackColor = false;
@@ -330,16 +388,18 @@ namespace Centro_Empleado
             this.Controls.Add(this.chkGrupoFamiliar);
             this.Controls.Add(this.txtEmpresa);
             this.Controls.Add(this.lblEmpresa);
+            this.Controls.Add(this.txtNumeroAfiliado);
+            this.Controls.Add(this.lblNumeroAfiliado);
             this.Controls.Add(this.txtDNI);
             this.Controls.Add(this.lblDNI);
             this.Controls.Add(this.txtApellidoNombre);
             this.Controls.Add(this.lblApellidoNombre);
-            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
-            this.MaximizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(800, 600);
             this.Name = "frmAfiliado";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
             this.Text = "Gestión de Afiliados y Recetarios";
+            this.WindowState = System.Windows.Forms.FormWindowState.Maximized;
             ((System.ComponentModel.ISupportInitialize)(this.dgvAfiliados)).EndInit();
             this.paneltitulo.ResumeLayout(false);
             this.paneltitulo.PerformLayout();
@@ -354,6 +414,8 @@ namespace Centro_Empleado
     private System.Windows.Forms.TextBox txtApellidoNombre;
     private System.Windows.Forms.Label lblDNI;
     private System.Windows.Forms.TextBox txtDNI;
+    private System.Windows.Forms.Label lblNumeroAfiliado;
+    private System.Windows.Forms.TextBox txtNumeroAfiliado;
     private System.Windows.Forms.Label lblEmpresa;
     private System.Windows.Forms.TextBox txtEmpresa;
     private System.Windows.Forms.CheckBox chkGrupoFamiliar;
@@ -371,6 +433,8 @@ namespace Centro_Empleado
         private System.Windows.Forms.Button btnVerCaja;
         private System.Windows.Forms.Button btnImprimirCupon;
         private System.Windows.Forms.Button btnManual;
+        private System.Windows.Forms.Button btnRecetaExtraordinaria;
+        private System.Windows.Forms.Button btnHistorialExtraordinarias;
 
     }
 }

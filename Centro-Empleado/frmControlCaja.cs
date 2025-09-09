@@ -136,17 +136,17 @@ namespace Centro_Empleado
                 
                 // Mostrar total general
                 decimal totalGeneral = dbManager.ObtenerTotalCajaPorRangoFechas(fechaDesde, fechaHasta);
-                lblTotalGeneral.Text = $"Total General: ${totalGeneral:F2}";
+                lblTotalGeneral.Text = string.Format("Total General: ${0:F2}", totalGeneral);
                 
                 // Mostrar cantidad de bonos
-                lblCantidadBonos.Text = $"Cantidad de Bonos: {bonos.Count}";
+                lblCantidadBonos.Text = string.Format("Cantidad de Bonos: {0}", bonos.Count);
                 
                 // Personalizar grillas
                 PersonalizarGrillas();
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al cargar datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al cargar datos: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
             finally
             {
@@ -181,7 +181,7 @@ namespace Centro_Empleado
             {
                 SaveFileDialog saveDialog = new SaveFileDialog();
                 saveDialog.Filter = "Archivo CSV (*.csv)|*.csv|Todos los archivos (*.*)|*.*";
-                saveDialog.FileName = $"ControlCaja_{dtpFechaDesde.Value:yyyyMMdd}_{dtpFechaHasta.Value:yyyyMMdd}.csv";
+                saveDialog.FileName = string.Format("ControlCaja_{0:yyyyMMdd}_{1:yyyyMMdd}.csv", dtpFechaDesde.Value, dtpFechaHasta.Value);
                 
                 if (saveDialog.ShowDialog() == DialogResult.OK)
                 {
@@ -191,7 +191,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al exportar: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al exportar: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -200,16 +200,26 @@ namespace Centro_Empleado
             var bonos = (System.Collections.IList)dgvBonos.DataSource;
             if (bonos == null || bonos.Count == 0) return;
             
-            using (var writer = new System.IO.StreamWriter(rutaArchivo))
+            using (var writer = new System.IO.StreamWriter(rutaArchivo, false, System.Text.Encoding.UTF8))
             {
-                // Encabezados
-                writer.WriteLine("N° Bono,Fecha,Apellido y Nombre,DNI,Concepto,Monto");
+                // Agregar BOM para que Excel reconozca UTF-8
+                writer.Write('\uFEFF');
+                
+                // Encabezados - usar punto y coma como separador
+                writer.WriteLine("N° Bono;Fecha;Apellido y Nombre;DNI;Concepto;Monto");
                 
                 // Datos
+                decimal totalMonto = 0;
                 foreach (dynamic bono in bonos)
                 {
-                    writer.WriteLine($"\"{bono.NumeroBono}\",\"{bono.FechaEmision:dd/MM/yyyy}\",\"{bono.ApellidoNombre}\",\"{bono.DNI}\",\"{bono.Concepto}\",\"{bono.Monto:F2}\"");
+                    writer.WriteLine(string.Format("{0};{1:dd/MM/yyyy};{2};{3};{4};{5:F2}", 
+                        bono.NumeroBono, bono.FechaEmision, bono.ApellidoNombre, bono.DNI, bono.Concepto, bono.Monto));
+                    totalMonto += bono.Monto;
                 }
+                
+                // Fila de total
+                writer.WriteLine(string.Format("TOTAL;;;;;{0:F2}", totalMonto));
+                writer.WriteLine(string.Format("CANTIDAD DE BONOS;{0};;;;;", bonos.Count));
             }
         }
 

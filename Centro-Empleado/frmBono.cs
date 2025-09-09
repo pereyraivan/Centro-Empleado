@@ -91,7 +91,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al buscar afiliado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al buscar afiliado: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -110,7 +110,8 @@ namespace Centro_Empleado
                 return;
             }
 
-            if (!decimal.TryParse(txtMonto.Text, out decimal monto) || monto <= 0)
+            decimal monto;
+            if (!decimal.TryParse(txtMonto.Text, out monto) || monto <= 0)
             {
                 MessageBox.Show("El monto debe ser un número válido mayor a 0.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtMonto.Focus();
@@ -137,7 +138,7 @@ namespace Centro_Empleado
                 // Generar e imprimir el bono
                 GenerarEImprimirBono(bono, afiliadoSeleccionado);
 
-                MessageBox.Show($"Bono {bono.NumeroBono} generado correctamente por ${monto:F2}", 
+                MessageBox.Show(string.Format("Bono {0} generado correctamente por ${1:F2}", bono.NumeroBono, monto), 
                     "Bono generado", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // Limpiar formulario para el siguiente bono
@@ -145,7 +146,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al generar el bono: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al generar el bono: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -176,7 +177,7 @@ namespace Centro_Empleado
                 html = CorregirRutaLogo(html);
                 
                 // Guardar y abrir el archivo HTML (mismo método que RecetarioManager)
-                string tempFile = Path.Combine(Path.GetTempPath(), $"bono_{bono.NumeroBono}_{DateTime.Now.Ticks}.html");
+                string tempFile = Path.Combine(Path.GetTempPath(), string.Format("bono_{0}_{1}.html", bono.NumeroBono, DateTime.Now.Ticks));
                 File.WriteAllText(tempFile, html, System.Text.Encoding.UTF8);
                 
                 // Abrir con el navegador predeterminado (mismo método que RecetarioManager)
@@ -184,7 +185,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al generar el bono: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al generar el bono: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 

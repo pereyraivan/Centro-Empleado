@@ -5,6 +5,12 @@
 -- Desactivar verificación de claves foráneas temporalmente
 PRAGMA foreign_keys = OFF;
 
+-- Limpiar tabla de Recetarios Extraordinarios (eliminar todos los registros)
+DELETE FROM RecetarioExtraordinario;
+
+-- Limpiar tabla de Recetarios Mensuales (eliminar todos los registros)
+DELETE FROM RecetarioMensual;
+
 -- Limpiar tabla de Bonos (eliminar todos los registros)
 DELETE FROM Bono;
 
@@ -18,7 +24,7 @@ DELETE FROM Familiar;
 DELETE FROM Afiliado;
 
 -- Reiniciar los contadores de auto-incremento
-DELETE FROM sqlite_sequence WHERE name IN ('Afiliado', 'Familiar', 'Recetario', 'Bono');
+DELETE FROM sqlite_sequence WHERE name IN ('Afiliado', 'Familiar', 'Recetario', 'Bono', 'RecetarioMensual', 'RecetarioExtraordinario');
 
 -- Reactivar verificación de claves foráneas
 PRAGMA foreign_keys = ON;
@@ -28,6 +34,8 @@ SELECT 'Afiliados restantes: ' || COUNT(*) as Resultado FROM Afiliado;
 SELECT 'Familiares restantes: ' || COUNT(*) as Resultado FROM Familiar;
 SELECT 'Recetarios restantes: ' || COUNT(*) as Resultado FROM Recetario;
 SELECT 'Bonos restantes: ' || COUNT(*) as Resultado FROM Bono;
+SELECT 'Recetarios Mensuales restantes: ' || COUNT(*) as Resultado FROM RecetarioMensual;
+SELECT 'Recetarios Extraordinarios restantes: ' || COUNT(*) as Resultado FROM RecetarioExtraordinario;
 
 -- Mensaje de confirmación
 SELECT 'Base de datos limpiada exitosamente. Todas las tablas están vacías.' as Estado;

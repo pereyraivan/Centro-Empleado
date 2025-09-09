@@ -29,11 +29,130 @@ namespace Centro_Empleado.Data
                     throw new Exception("La cadena de conexión 'CentroEmpleadoDB' está vacía");
                 }
                 
+                // Verificar arquitectura del sistema
+                string arquitectura = Environment.Is64BitProcess ? "x64" : "x86";
+                
                 InitializeDatabase();
+                MigrarBaseDatos();
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al inicializar la base de datos: {ex.Message}\n\nDetalles: {ex.ToString()}");
+                // Proporcionar información adicional sobre el error de arquitectura
+                string mensajeError = ex.Message;
+                if (ex.Message.Contains("0x8007000B") || ex.Message.Contains("formato incorrecto"))
+                {
+                    mensajeError += "\n\nSOLUCIÓN: Este error indica un problema de arquitectura con SQLite. " +
+                                  "Asegúrate de que la aplicación esté compilada para x86 y que las DLLs " +
+                                  "de SQLite.Interop.dll estén en el directorio de salida.";
+                }
+                
+                throw new Exception(string.Format("Error al inicializar la base de datos: {0}\n\nDetalles: {1}", mensajeError, ex.ToString()));
+            }
+        }
+
+        // Método para migrar la base de datos existente
+        private void MigrarBaseDatos()
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    // Verificar si la columna NumeroAfiliado ya existe
+                    string checkColumnSql = "PRAGMA table_info(Afiliado)";
+                    using (var command = new SQLiteCommand(checkColumnSql, connection))
+                    {
+                        using (var reader = command.ExecuteReader())
+                        {
+                            bool columnExists = false;
+                            while (reader.Read())
+                            {
+                                if (reader["name"].ToString() == "NumeroAfiliado")
+                                {
+                                    columnExists = true;
+                                    break;
+                                }
+                            }
+                            
+                            if (!columnExists)
+                            {
+                                // Agregar la columna NumeroAfiliado
+                                string addColumnSql = "ALTER TABLE Afiliado ADD COLUMN NumeroAfiliado TEXT";
+                                using (var alterCommand = new SQLiteCommand(addColumnSql, connection))
+                                {
+                                    alterCommand.ExecuteNonQuery();
+                                }
+                                
+                                // Actualizar registros existentes con un número de afiliado temporal
+                                string updateSql = "UPDATE Afiliado SET NumeroAfiliado = 'TEMP' || Id WHERE NumeroAfiliado IS NULL";
+                                using (var updateCommand = new SQLiteCommand(updateSql, connection))
+                                {
+                                    updateCommand.ExecuteNonQuery();
+                                }
+                            }
+                            
+                            // Verificar si la tabla RecetarioMensual existe
+                            string checkRecetarioMensualSql = "SELECT name FROM sqlite_master WHERE type='table' AND name='RecetarioMensual'";
+                            using (var checkRecetarioCommand = new SQLiteCommand(checkRecetarioMensualSql, connection))
+                            {
+                                var recetarioMensualExists = checkRecetarioCommand.ExecuteScalar() != null;
+                                if (!recetarioMensualExists)
+                                {
+                                    // Crear tabla RecetarioMensual
+                                    string createRecetarioMensualTable = @"
+                                        CREATE TABLE RecetarioMensual (
+                                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            IdAfiliado INTEGER NOT NULL,
+                                            FechaImpresion DATETIME NOT NULL,
+                                            NumeroRecetario INTEGER NOT NULL,
+                                            FOREIGN KEY (IdAfiliado) REFERENCES Afiliado(Id)
+                                        )";
+                                    using (var createCommand = new SQLiteCommand(createRecetarioMensualTable, connection))
+                                    {
+                                        createCommand.ExecuteNonQuery();
+                                    }
+                                }
+
+                                // Verificar si existe la tabla RecetarioExtraordinario
+                                string checkRecetarioExtraordinarioTable = @"
+                                    SELECT name FROM sqlite_master 
+                                    WHERE type='table' AND name='RecetarioExtraordinario'";
+                                bool recetarioExtraordinarioExists = false;
+                                using (var checkExtraordinarioCommand = new SQLiteCommand(checkRecetarioExtraordinarioTable, connection))
+                                {
+                                    using (var readerExtraordinario = checkExtraordinarioCommand.ExecuteReader())
+                                    {
+                                        recetarioExtraordinarioExists = readerExtraordinario.HasRows;
+                                    }
+                                }
+
+                                if (!recetarioExtraordinarioExists)
+                                {
+                                    // Crear tabla RecetarioExtraordinario
+                                    string createRecetarioExtraordinarioTable = @"
+                                        CREATE TABLE RecetarioExtraordinario (
+                                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                                            IdAfiliado INTEGER NOT NULL,
+                                            FechaImpresion DATETIME NOT NULL,
+                                            NumeroRecetario INTEGER NOT NULL,
+                                            Motivo TEXT NOT NULL,
+                                            FOREIGN KEY (IdAfiliado) REFERENCES Afiliado(Id)
+                                        )";
+                                    using (var createCommand = new SQLiteCommand(createRecetarioExtraordinarioTable, connection))
+                                    {
+                                        createCommand.ExecuteNonQuery();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                // Si hay error en la migración, no es crítico, solo log
+                System.Diagnostics.Debug.WriteLine("Error en migración de base de datos: " + ex.Message);
             }
         }
 
@@ -71,6 +190,7 @@ namespace Centro_Empleado.Data
                     connection.Open();
                     
                     // Eliminar tablas si existen
+                    ExecuteNonQuery("DROP TABLE IF EXISTS RecetarioMensual", connection);
                     ExecuteNonQuery("DROP TABLE IF EXISTS Recetario", connection);
                     ExecuteNonQuery("DROP TABLE IF EXISTS Familiar", connection);
                     ExecuteNonQuery("DROP TABLE IF EXISTS Afiliado", connection);
@@ -81,6 +201,7 @@ namespace Centro_Empleado.Data
                             Id INTEGER PRIMARY KEY AUTOINCREMENT,
                             ApellidoNombre TEXT NOT NULL,
                             DNI TEXT NOT NULL UNIQUE,
+                            NumeroAfiliado TEXT NOT NULL UNIQUE,
                             Empresa TEXT NOT NULL,
                             TieneGrupoFamiliar INTEGER NOT NULL
                         )";
@@ -107,11 +228,22 @@ namespace Centro_Empleado.Data
                     ExecuteNonQuery(createAfiliadoTable, connection);
                     ExecuteNonQuery(createFamiliarTable, connection);
                     ExecuteNonQuery(createRecetarioTable, connection);
+                    
+                    // Crear tabla RecetarioMensual
+                    string createRecetarioMensualTable = @"
+                        CREATE TABLE RecetarioMensual (
+                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            IdAfiliado INTEGER NOT NULL,
+                            FechaImpresion DATETIME NOT NULL,
+                            NumeroRecetario INTEGER NOT NULL,
+                            FOREIGN KEY (IdAfiliado) REFERENCES Afiliado(Id)
+                        )";
+                    ExecuteNonQuery(createRecetarioMensualTable, connection);
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al recrear las tablas: {ex.Message}");
+                throw new Exception(string.Format("Error al recrear las tablas: {0}", ex.Message));
             }
         }
 
@@ -135,7 +267,7 @@ namespace Centro_Empleado.Data
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error en InitializeDatabase: {ex.Message}\n\nCadena de conexión: {connectionString}\n\nDetalles: {ex.ToString()}");
+                throw new Exception(string.Format("Error en InitializeDatabase: {0}\n\nCadena de conexión: {1}\n\nDetalles: {2}", ex.Message, connectionString, ex.ToString()));
             }
         }
 
@@ -152,6 +284,7 @@ namespace Centro_Empleado.Data
                             Id INTEGER PRIMARY KEY AUTOINCREMENT,
                             ApellidoNombre TEXT NOT NULL,
                             DNI TEXT NOT NULL UNIQUE,
+                            NumeroAfiliado TEXT NOT NULL UNIQUE,
                             Empresa TEXT NOT NULL,
                             TieneGrupoFamiliar INTEGER NOT NULL
                         )";
@@ -179,13 +312,24 @@ namespace Centro_Empleado.Data
                     ExecuteNonQuery(createFamiliarTable, connection);
                     ExecuteNonQuery(createRecetarioTable, connection);
                     
+                    // Crear tabla RecetarioMensual
+                    string createRecetarioMensualTable = @"
+                        CREATE TABLE IF NOT EXISTS RecetarioMensual (
+                            Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                            IdAfiliado INTEGER NOT NULL,
+                            FechaImpresion DATETIME NOT NULL,
+                            NumeroRecetario INTEGER NOT NULL,
+                            FOREIGN KEY (IdAfiliado) REFERENCES Afiliado(Id)
+                        )";
+                    ExecuteNonQuery(createRecetarioMensualTable, connection);
+                    
                     // Crear tabla de bonos
                     CreateBonoTable();
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al crear las tablas de la base de datos: {ex.Message}");
+                throw new Exception(string.Format("Error al crear las tablas de la base de datos: {0}", ex.Message));
             }
         }
 
@@ -200,15 +344,29 @@ namespace Centro_Empleado.Data
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al ejecutar SQL: {sql}. Error: {ex.Message}");
+                throw new Exception(string.Format("Error al ejecutar SQL: {0}. Error: {1}", sql, ex.Message));
             }
         }
 
         // Métodos para Afiliado
         public void InsertarAfiliado(Afiliado afiliado)
         {
-            string sql = @"INSERT INTO Afiliado (ApellidoNombre, DNI, Empresa, TieneGrupoFamiliar) 
-                          VALUES (@ApellidoNombre, @DNI, @Empresa, @TieneGrupoFamiliar)";
+            // Verificar si el DNI ya existe
+            var afiliadoExistente = BuscarAfiliadoPorDNI(afiliado.DNI);
+            if (afiliadoExistente != null)
+            {
+                throw new InvalidOperationException(string.Format("Ya existe un afiliado con el DNI {0}.", afiliado.DNI));
+            }
+
+            // Verificar si el número de afiliado ya existe
+            var afiliadoConNumero = BuscarAfiliadoPorNumero(afiliado.NumeroAfiliado);
+            if (afiliadoConNumero != null)
+            {
+                throw new InvalidOperationException(string.Format("Ya existe un afiliado con el número {0}.", afiliado.NumeroAfiliado));
+            }
+
+            string sql = @"INSERT INTO Afiliado (ApellidoNombre, DNI, NumeroAfiliado, Empresa, TieneGrupoFamiliar) 
+                          VALUES (@ApellidoNombre, @DNI, @NumeroAfiliado, @Empresa, @TieneGrupoFamiliar)";
 
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -217,6 +375,7 @@ namespace Centro_Empleado.Data
                 {
                     command.Parameters.AddWithValue("@ApellidoNombre", afiliado.ApellidoNombre);
                     command.Parameters.AddWithValue("@DNI", afiliado.DNI);
+                    command.Parameters.AddWithValue("@NumeroAfiliado", afiliado.NumeroAfiliado);
                     command.Parameters.AddWithValue("@Empresa", afiliado.Empresa);
                     command.Parameters.AddWithValue("@TieneGrupoFamiliar", afiliado.TieneGrupoFamiliar ? 1 : 0);
                     command.ExecuteNonQuery();
@@ -243,6 +402,37 @@ namespace Centro_Empleado.Data
                                 Id = Convert.ToInt32(reader["Id"]),
                                 ApellidoNombre = reader["ApellidoNombre"].ToString(),
                                 DNI = reader["DNI"].ToString(),
+                                NumeroAfiliado = reader["NumeroAfiliado"].ToString(),
+                                Empresa = reader["Empresa"].ToString(),
+                                TieneGrupoFamiliar = Convert.ToBoolean(reader["TieneGrupoFamiliar"])
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
+        }
+
+        public Afiliado BuscarAfiliadoPorNumero(string numeroAfiliado)
+        {
+            string sql = "SELECT * FROM Afiliado WHERE NumeroAfiliado = @NumeroAfiliado";
+
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@NumeroAfiliado", numeroAfiliado);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new Afiliado
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                ApellidoNombre = reader["ApellidoNombre"].ToString(),
+                                DNI = reader["DNI"].ToString(),
+                                NumeroAfiliado = reader["NumeroAfiliado"].ToString(),
                                 Empresa = reader["Empresa"].ToString(),
                                 TieneGrupoFamiliar = Convert.ToBoolean(reader["TieneGrupoFamiliar"])
                             };
@@ -370,7 +560,7 @@ namespace Centro_Empleado.Data
         }
 
         // Método para obtener 2 números consecutivos de una vez de manera segura
-        public (int primero, int segundo) ObtenerDosNumerosConsecutivos()
+        public NumerosConsecutivos ObtenerDosNumerosConsecutivos()
         {
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -393,7 +583,7 @@ namespace Centro_Empleado.Data
                         int segundo = maxActual + 2;
                         
                         transaction.Commit();
-                        return (primero, segundo);
+                        return new NumerosConsecutivos { Primero = primero, Segundo = segundo };
                     }
                     catch
                     {
@@ -466,6 +656,7 @@ namespace Centro_Empleado.Data
                                 Id = Convert.ToInt32(reader["Id"]),
                                 ApellidoNombre = reader["ApellidoNombre"].ToString(),
                                 DNI = reader["DNI"].ToString(),
+                                NumeroAfiliado = reader["NumeroAfiliado"].ToString(),
                                 Empresa = reader["Empresa"].ToString(),
                                 TieneGrupoFamiliar = Convert.ToBoolean(reader["TieneGrupoFamiliar"])
                             });
@@ -497,6 +688,7 @@ namespace Centro_Empleado.Data
                                 Id = Convert.ToInt32(reader["Id"]),
                                 ApellidoNombre = reader["ApellidoNombre"].ToString(),
                                 DNI = reader["DNI"].ToString(),
+                                NumeroAfiliado = reader["NumeroAfiliado"].ToString(),
                                 Empresa = reader["Empresa"].ToString(),
                                 TieneGrupoFamiliar = Convert.ToBoolean(reader["TieneGrupoFamiliar"])
                             });
@@ -618,14 +810,14 @@ namespace Centro_Empleado.Data
                         catch (Exception ex)
                         {
                             transaction.Rollback();
-                            throw new Exception($"Error durante la transacción: {ex.Message}", ex);
+                            throw new Exception(string.Format("Error durante la transacción: {0}", ex.Message), ex);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al eliminar afiliado ID {idAfiliado}: {ex.Message}", ex);
+                throw new Exception(string.Format("Error al eliminar afiliado ID {0}: {1}", idAfiliado, ex.Message), ex);
             }
         }
 
@@ -727,17 +919,17 @@ namespace Centro_Empleado.Data
                 bool existeDB = File.Exists(dbPath);
                 
                 // Obtener información de la conexión
-                string info = $"INFORMACIÓN DE BASE DE DATOS:\n\n";
-                info += $"Ruta de la base de datos: {dbPath}\n";
-                info += $"¿Existe el archivo?: {existeDB}\n";
-                info += $"Connection String: {connectionString}\n\n";
+                string info = "INFORMACIÓN DE BASE DE DATOS:\n\n";
+                info += string.Format("Ruta de la base de datos: {0}\n", dbPath);
+                info += string.Format("¿Existe el archivo?: {0}\n", existeDB);
+                info += string.Format("Connection String: {0}\n\n", connectionString);
                 
                 // Si existe la base de datos, obtener información adicional
                 if (existeDB)
                 {
                     var fileInfo = new FileInfo(dbPath);
-                    info += $"Tamaño del archivo: {fileInfo.Length} bytes\n";
-                    info += $"Última modificación: {fileInfo.LastWriteTime}\n";
+                    info += string.Format("Tamaño del archivo: {0} bytes\n", fileInfo.Length);
+                    info += string.Format("Última modificación: {0}\n", fileInfo.LastWriteTime);
                     
                     // Probar conexión y contar registros
                     using (var connection = new SQLiteConnection(connectionString))
@@ -746,12 +938,12 @@ namespace Centro_Empleado.Data
                         using (var command = new SQLiteCommand("SELECT COUNT(*) FROM Afiliado", connection))
                         {
                             int countAfiliados = Convert.ToInt32(command.ExecuteScalar());
-                            info += $"Total de afiliados en DB: {countAfiliados}\n";
+                            info += string.Format("Total de afiliados en DB: {0}\n", countAfiliados);
                         }
                         using (var command = new SQLiteCommand("SELECT COUNT(*) FROM Recetario", connection))
                         {
                             int countRecetarios = Convert.ToInt32(command.ExecuteScalar());
-                            info += $"Total de recetarios en DB: {countRecetarios}\n";
+                            info += string.Format("Total de recetarios en DB: {0}\n", countRecetarios);
                         }
                     }
                 }
@@ -765,7 +957,7 @@ namespace Centro_Empleado.Data
             }
             catch (Exception ex)
             {
-                return $"Error al obtener información de la base de datos: {ex.Message}";
+                return string.Format("Error al obtener información de la base de datos: {0}", ex.Message);
             }
         }
 
@@ -850,7 +1042,7 @@ namespace Centro_Empleado.Data
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al crear tabla Bono: {ex.Message}");
+                throw new Exception(string.Format("Error al crear tabla Bono: {0}", ex.Message));
             }
         }
         
@@ -860,7 +1052,7 @@ namespace Centro_Empleado.Data
             // Verificar que el número de bono no exista ya
             if (NumeroBonoExiste(bono.NumeroBono))
             {
-                throw new Exception($"El número de bono {bono.NumeroBono} ya existe en la base de datos.");
+                throw new Exception(string.Format("El número de bono {0} ya existe en la base de datos.", bono.NumeroBono));
             }
             
             string sql = @"INSERT INTO Bono (IdAfiliado, NumeroBono, FechaEmision, Monto, Concepto, Observaciones, FechaCreacion) 
@@ -920,13 +1112,13 @@ namespace Centro_Empleado.Data
                         
                         int ultimoNumero = Convert.ToInt32(result);
                         int siguienteNumero = ultimoNumero + 1;
-                        return $"BON-{siguienteNumero:D6}";
+                        return string.Format("BON-{0:D6}", siguienteNumero);
                     }
                     catch
                     {
                         // Si hay algún error, usar timestamp para garantizar unicidad
                         long timestamp = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
-                        return $"BON-{timestamp:D6}";
+                        return string.Format("BON-{0:D6}", timestamp);
                     }
                 }
             }
@@ -1061,9 +1253,24 @@ namespace Centro_Empleado.Data
         {
             try
             {
+                // Verificar si el DNI ya existe en otro afiliado
+                var afiliadoConDNI = BuscarAfiliadoPorDNI(afiliado.DNI);
+                if (afiliadoConDNI != null && afiliadoConDNI.Id != afiliado.Id)
+                {
+                    throw new InvalidOperationException(string.Format("Ya existe un afiliado con el DNI {0}.", afiliado.DNI));
+                }
+
+                // Verificar si el número de afiliado ya existe en otro afiliado
+                var afiliadoConNumero = BuscarAfiliadoPorNumero(afiliado.NumeroAfiliado);
+                if (afiliadoConNumero != null && afiliadoConNumero.Id != afiliado.Id)
+                {
+                    throw new InvalidOperationException(string.Format("Ya existe un afiliado con el número {0}.", afiliado.NumeroAfiliado));
+                }
+
                 string sql = @"UPDATE Afiliado 
                               SET ApellidoNombre = @ApellidoNombre, 
                                   DNI = @DNI, 
+                                  NumeroAfiliado = @NumeroAfiliado,
                                   Empresa = @Empresa, 
                                   TieneGrupoFamiliar = @TieneGrupoFamiliar 
                               WHERE Id = @Id";
@@ -1076,6 +1283,7 @@ namespace Centro_Empleado.Data
                         command.Parameters.AddWithValue("@Id", afiliado.Id);
                         command.Parameters.AddWithValue("@ApellidoNombre", afiliado.ApellidoNombre);
                         command.Parameters.AddWithValue("@DNI", afiliado.DNI);
+                        command.Parameters.AddWithValue("@NumeroAfiliado", afiliado.NumeroAfiliado);
                         command.Parameters.AddWithValue("@Empresa", afiliado.Empresa);
                         command.Parameters.AddWithValue("@TieneGrupoFamiliar", afiliado.TieneGrupoFamiliar ? 1 : 0);
                         int filasAfectadas = command.ExecuteNonQuery();
@@ -1083,9 +1291,9 @@ namespace Centro_Empleado.Data
                     }
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                return false;
+                throw new Exception(string.Format("Error al actualizar afiliado: {0}", ex.Message));
             }
         }
 
@@ -1109,6 +1317,18 @@ namespace Centro_Empleado.Data
                             using (var command = new SQLiteCommand("PRAGMA foreign_keys = OFF", connection, transaction))
                             {
                                 command.ExecuteNonQuery();
+                            }
+
+                            // Limpiar tabla de Recetarios Extraordinarios
+                            using (var command = new SQLiteCommand("DELETE FROM RecetarioExtraordinario", connection, transaction))
+                            {
+                                int recetariosExtraordinariosEliminados = command.ExecuteNonQuery();
+                            }
+
+                            // Limpiar tabla de Recetarios Mensuales
+                            using (var command = new SQLiteCommand("DELETE FROM RecetarioMensual", connection, transaction))
+                            {
+                                int recetariosMensualesEliminados = command.ExecuteNonQuery();
                             }
 
                             // Limpiar tabla de Bonos
@@ -1136,7 +1356,7 @@ namespace Centro_Empleado.Data
                             }
 
                             // Reiniciar contadores de auto-incremento
-                            using (var command = new SQLiteCommand("DELETE FROM sqlite_sequence WHERE name IN ('Afiliado', 'Familiar', 'Recetario', 'Bono')", connection, transaction))
+                            using (var command = new SQLiteCommand("DELETE FROM sqlite_sequence WHERE name IN ('Afiliado', 'Familiar', 'Recetario', 'Bono', 'RecetarioMensual', 'RecetarioExtraordinario')", connection, transaction))
                             {
                                 command.ExecuteNonQuery();
                             }
@@ -1153,15 +1373,263 @@ namespace Centro_Empleado.Data
                         catch (Exception ex)
                         {
                             transaction.Rollback();
-                            throw new Exception($"Error durante la limpieza: {ex.Message}", ex);
+                            throw new Exception(string.Format("Error durante la limpieza: {0}", ex.Message), ex);
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al limpiar la base de datos: {ex.Message}", ex);
+                throw new Exception(string.Format("Error al limpiar la base de datos: {0}", ex.Message), ex);
             }
         }
+
+        // ========================================
+        // MÉTODOS PARA SISTEMA DE RECETARIOS MENSUALES
+        // ========================================
+
+        // Obtener recetarios disponibles para un afiliado (máximo 3 por mes)
+        public int ObtenerRecetariosDisponibles(int idAfiliado)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    // Obtener recetarios impresos en los últimos 30 días
+                    string sql = @"
+                        SELECT COUNT(*) 
+                        FROM RecetarioMensual 
+                        WHERE IdAfiliado = @IdAfiliado 
+                        AND FechaImpresion >= datetime('now', '-30 days')";
+                    
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        int recetariosUsados = Convert.ToInt32(command.ExecuteScalar());
+                        return Math.Max(0, 3 - recetariosUsados);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al obtener recetarios disponibles: {0}", ex.Message));
+            }
+        }
+
+        // Registrar un recetario impreso
+        public void RegistrarRecetarioImpreso(int idAfiliado, int numeroRecetario)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    string sql = @"
+                        INSERT INTO RecetarioMensual (IdAfiliado, FechaImpresion, NumeroRecetario) 
+                        VALUES (@IdAfiliado, datetime('now'), @NumeroRecetario)";
+                    
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        command.Parameters.AddWithValue("@NumeroRecetario", numeroRecetario);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al registrar recetario impreso: {0}", ex.Message));
+            }
+        }
+
+        // Obtener fecha de próxima habilitación de recetario
+        public DateTime? FechaProximaHabilitacionRecetario(int idAfiliado)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    // Obtener la fecha más antigua de los recetarios impresos en los últimos 30 días
+                    string sql = @"
+                        SELECT MIN(FechaImpresion) 
+                        FROM RecetarioMensual 
+                        WHERE IdAfiliado = @IdAfiliado 
+                        AND FechaImpresion >= datetime('now', '-30 days')";
+                    
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        var result = command.ExecuteScalar();
+                        
+                        if (result != null && result != DBNull.Value)
+                        {
+                            DateTime fechaImpresion = Convert.ToDateTime(result);
+                            return fechaImpresion.AddDays(30);
+                        }
+                        
+                        return null;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al obtener fecha de próxima habilitación: {0}", ex.Message));
+            }
+        }
+
+        // Verificar si ya imprimió receta extraordinaria este mes
+        public bool YaImprimioRecetaExtraordinariaEsteMes(int idAfiliado)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    string sql = @"
+                        SELECT COUNT(*) 
+                        FROM RecetarioExtraordinario 
+                        WHERE IdAfiliado = @IdAfiliado 
+                        AND FechaImpresion >= datetime('now', 'start of month')";
+                    
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        int count = Convert.ToInt32(command.ExecuteScalar());
+                        return count > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al verificar receta extraordinaria: {0}", ex.Message));
+            }
+        }
+
+        // Obtener historial de recetas extraordinarias de un afiliado
+        public List<dynamic> ObtenerHistorialRecetasExtraordinarias(int idAfiliado)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    string sql = @"
+                        SELECT FechaImpresion, NumeroRecetario, Motivo
+                        FROM RecetarioExtraordinario 
+                        WHERE IdAfiliado = @IdAfiliado 
+                        ORDER BY FechaImpresion DESC";
+                    
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            var historial = new List<dynamic>();
+                            while (reader.Read())
+                            {
+                                historial.Add(new
+                                {
+                                    FechaImpresion = Convert.ToDateTime(reader["FechaImpresion"]),
+                                    NumeroRecetario = Convert.ToInt32(reader["NumeroRecetario"]),
+                                    Motivo = reader["Motivo"].ToString()
+                                });
+                            }
+                            return historial;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al obtener historial de recetas extraordinarias: {0}", ex.Message));
+            }
+        }
+
+        // Registrar recetario extraordinario
+        public void RegistrarRecetarioExtraordinario(int idAfiliado, int numeroRecetario, string motivo)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    string sql = @"
+                        INSERT INTO RecetarioExtraordinario (IdAfiliado, NumeroRecetario, FechaImpresion, Motivo)
+                        VALUES (@IdAfiliado, @NumeroRecetario, datetime('now'), @Motivo)";
+                    
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        command.Parameters.AddWithValue("@NumeroRecetario", numeroRecetario);
+                        command.Parameters.AddWithValue("@Motivo", motivo);
+                        command.ExecuteNonQuery();
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al registrar recetario extraordinario: {0}", ex.Message));
+            }
+        }
+
+        // Obtener historial de recetarios mensuales de un afiliado
+        public List<dynamic> ObtenerHistorialRecetariosMensuales(int idAfiliado)
+        {
+            try
+            {
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    
+                    string sql = @"
+                        SELECT FechaImpresion, NumeroRecetario,
+                               CASE 
+                                   WHEN FechaImpresion >= datetime('now', '-30 days') THEN 'Disponible'
+                                   ELSE 'Habilitado el ' || date(FechaImpresion, '+30 days')
+                               END as Estado
+                        FROM RecetarioMensual 
+                        WHERE IdAfiliado = @IdAfiliado 
+                        ORDER BY FechaImpresion DESC";
+                    
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@IdAfiliado", idAfiliado);
+                        using (var reader = command.ExecuteReader())
+                        {
+                            var historial = new List<dynamic>();
+                            while (reader.Read())
+                            {
+                                historial.Add(new
+                                {
+                                    FechaImpresion = Convert.ToDateTime(reader["FechaImpresion"]).ToString("dd/MM/yyyy"),
+                                    NumeroRecetario = Convert.ToInt32(reader["NumeroRecetario"]),
+                                    Estado = reader["Estado"].ToString()
+                                });
+                            }
+                            return historial;
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al obtener historial de recetarios: {0}", ex.Message));
+            }
+        }
+    }
+
+    // Clase para reemplazar tuplas en C# 5.0
+    public class NumerosConsecutivos
+    {
+        public int Primero { get; set; }
+        public int Segundo { get; set; }
     }
 }

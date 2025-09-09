@@ -23,7 +23,7 @@ namespace Centro_Empleado
             cboAfiliados.Items.Clear();
             foreach (var afiliado in afiliados)
             {
-                cboAfiliados.Items.Add($"{afiliado.Id} - {afiliado.ApellidoNombre} ({(afiliado.TieneGrupoFamiliar ? "Grupo Familiar" : "Individual")})");
+                cboAfiliados.Items.Add(string.Format("{0} - {1} ({2})", afiliado.Id, afiliado.ApellidoNombre, (afiliado.TieneGrupoFamiliar ? "Grupo Familiar" : "Individual")));
             }
         }
 
@@ -38,10 +38,10 @@ namespace Centro_Empleado
             var afiliadoId = ObtenerIdAfiliado();
             var recetarios = dbManager.ObtenerInfoRecetariosParaPruebas(afiliadoId);
             
-            string info = $"Recetarios del afiliado ID: {afiliadoId}\n\n";
+            string info = string.Format("Recetarios del afiliado ID: {0}\n\n", afiliadoId);
             foreach (var rec in recetarios)
             {
-                info += $"ID: {rec.Id}, Nº: {rec.NumeroTalonario:D6}, Emisión: {rec.FechaEmision:dd/MM/yyyy}, Vencimiento: {rec.FechaVencimiento:dd/MM/yyyy}\n";
+                info += string.Format("ID: {0}, Nº: {1:D6}, Emisión: {2:dd/MM/yyyy}, Vencimiento: {3:dd/MM/yyyy}\n", rec.Id, rec.NumeroTalonario, rec.FechaEmision, rec.FechaVencimiento);
             }
             
             if (recetarios.Count == 0)
@@ -71,30 +71,32 @@ namespace Centro_Empleado
             string opciones = "Seleccione el recetario a modificar:\n\n";
             foreach (var rec in recetarios)
             {
-                opciones += $"{rec.Id} - Nº {rec.NumeroTalonario:D6} (Emisión: {rec.FechaEmision:dd/MM/yyyy})\n";
+                opciones += string.Format("{0} - Nº {1:D6} (Emisión: {2:dd/MM/yyyy})\n", rec.Id, rec.NumeroTalonario, rec.FechaEmision);
             }
 
             var input = Microsoft.VisualBasic.Interaction.InputBox(opciones, "Seleccionar Recetario", "1");
-            if (int.TryParse(input, out int recetarioId))
+            int recetarioId;
+            if (int.TryParse(input, out recetarioId))
             {
                 var recetario = recetarios.Find(r => r.Id == recetarioId);
                 if (recetario != null)
                 {
                     var fechaInput = Microsoft.VisualBasic.Interaction.InputBox(
-                        $"Ingrese la nueva fecha de emisión para el recetario Nº {recetario.NumeroTalonario:D6}\n\nFormato: dd/mm/yyyy", 
+                        string.Format("Ingrese la nueva fecha de emisión para el recetario Nº {0:D6}\n\nFormato: dd/mm/yyyy", recetario.NumeroTalonario), 
                         "Nueva Fecha", 
                         DateTime.Now.ToString("dd/MM/yyyy"));
                     
-                    if (DateTime.TryParse(fechaInput, out DateTime nuevaFecha))
+                    DateTime nuevaFecha;
+                    if (DateTime.TryParse(fechaInput, out nuevaFecha))
                     {
                         try
                         {
                             dbManager.ModificarFechaEmisionRecetario(recetarioId, nuevaFecha);
-                            MessageBox.Show($"Fecha modificada correctamente a: {nuevaFecha:dd/MM/yyyy}", "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                            MessageBox.Show(string.Format("Fecha modificada correctamente a: {0:dd/MM/yyyy}", nuevaFecha), "Éxito", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
                         catch (Exception ex)
                         {
-                            MessageBox.Show($"Error al modificar fecha: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                            MessageBox.Show(string.Format("Error al modificar fecha: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                         }
                     }
                     else
@@ -124,17 +126,17 @@ namespace Centro_Empleado
             DateTime? proximaHabilitacion = dbManager.FechaProximaHabilitacion(afiliadoId);
             DateTime? ultimaImpresion = dbManager.ObtenerUltimaFechaImpresion(afiliadoId);
             
-            string info = $"INFORMACIÓN DE HABILITACIÓN\n\n";
-            info += $"Afiliado: {afiliado.ApellidoNombre}\n";
-            info += $"Tipo: {(afiliado.TieneGrupoFamiliar ? "Grupo Familiar (4 recetas)" : "Individual (2 recetas)")}\n";
-            info += $"Recetarios impresos en período actual: {recetariosImpresos}\n";
-            info += $"Última impresión: {(ultimaImpresion.HasValue ? ultimaImpresion.Value.ToString("dd/MM/yyyy") : "Nunca")}\n";
-            info += $"Próxima habilitación: {(proximaHabilitacion.HasValue ? proximaHabilitacion.Value.ToString("dd/MM/yyyy") : "Puede imprimir ahora")}\n";
+            string info = "INFORMACIÓN DE HABILITACIÓN\n\n";
+            info += string.Format("Afiliado: {0}\n", afiliado.ApellidoNombre);
+            info += string.Format("Tipo: {0}\n", (afiliado.TieneGrupoFamiliar ? "Grupo Familiar (4 recetas)" : "Individual (2 recetas)"));
+            info += string.Format("Recetarios impresos en período actual: {0}\n", recetariosImpresos);
+            info += string.Format("Última impresión: {0}\n", (ultimaImpresion.HasValue ? ultimaImpresion.Value.ToString("dd/MM/yyyy") : "Nunca"));
+            info += string.Format("Próxima habilitación: {0}\n", (proximaHabilitacion.HasValue ? proximaHabilitacion.Value.ToString("dd/MM/yyyy") : "Puede imprimir ahora"));
             
             if (ultimaImpresion.HasValue)
             {
                 var diasTranscurridos = (DateTime.Now - ultimaImpresion.Value).Days;
-                info += $"Días transcurridos desde última impresión: {diasTranscurridos}\n";
+                info += string.Format("Días transcurridos desde última impresión: {0}\n", diasTranscurridos);
             }
             
             MessageBox.Show(info, "Estado de Habilitación", MessageBoxButtons.OK, MessageBoxIcon.Information);
@@ -156,7 +158,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al recargar datos: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al recargar datos: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -169,7 +171,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al obtener información: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al obtener información: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -191,12 +193,12 @@ namespace Centro_Empleado
             }
 
             // Confirmar eliminación
-            string mensaje = $"¿Está seguro que desea eliminar al afiliado:\n\n";
-            mensaje += $"ID: {afiliado.Id}\n";
-            mensaje += $"Nombre: {afiliado.ApellidoNombre}\n";
-            mensaje += $"DNI: {afiliado.DNI}\n";
-            mensaje += $"Empresa: {afiliado.Empresa}\n";
-            mensaje += $"Tipo: {(afiliado.TieneGrupoFamiliar ? "Grupo Familiar" : "Individual")}\n\n";
+            string mensaje = "¿Está seguro que desea eliminar al afiliado:\n\n";
+            mensaje += string.Format("ID: {0}\n", afiliado.Id);
+            mensaje += string.Format("Nombre: {0}\n", afiliado.ApellidoNombre);
+            mensaje += string.Format("DNI: {0}\n", afiliado.DNI);
+            mensaje += string.Format("Empresa: {0}\n", afiliado.Empresa);
+            mensaje += string.Format("Tipo: {0}\n\n", (afiliado.TieneGrupoFamiliar ? "Grupo Familiar" : "Individual"));
             mensaje += "⚠️ ADVERTENCIA: Esta acción eliminará TODOS los recetarios asociados y NO se puede deshacer.";
 
             var confirm = MessageBox.Show(mensaje, "Confirmar Eliminación", MessageBoxButtons.YesNo, MessageBoxIcon.Warning);
@@ -223,7 +225,7 @@ namespace Centro_Empleado
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al eliminar afiliado: {ex.Message}", 
+                    MessageBox.Show(string.Format("Error al eliminar afiliado: {0}", ex.Message), 
                         "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
             }

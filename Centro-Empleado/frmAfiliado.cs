@@ -29,7 +29,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al inicializar el formulario:\n\n{ex.Message}\n\nDetalles:\n{ex.ToString()}", 
+                MessageBox.Show(string.Format("Error al inicializar el formulario:\n\n{0}\n\nDetalles:\n{1}", ex.Message, ex.ToString()), 
                     "Error de Inicialización", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 throw; // Re-lanzar para que Program.cs lo capture
             }
@@ -42,6 +42,8 @@ namespace Centro_Empleado
             btnEliminar.Click += btnEliminar_Click;
             btnImprimir.Click += btnImprimir_Click;
             dgvAfiliados.CellDoubleClick += dgvAfiliados_CellDoubleClick;
+            btnRecetaExtraordinaria.Click += btnRecetaExtraordinaria_Click;
+            btnHistorialExtraordinarias.Click += btnHistorialExtraordinarias_Click;
             dgvAfiliados.SelectionChanged += dgvAfiliados_SelectionChanged;
             txtBuscar.TextChanged += txtBuscar_TextChanged;
             dgvAfiliados.DataBindingComplete += dgvAfiliados_DataBindingComplete;
@@ -103,7 +105,8 @@ namespace Centro_Empleado
                 ? dbManager.ObtenerTodosLosAfiliados()
                 : dbManager.ObtenerTodosLosAfiliados().FindAll(a =>
                     (a.ApellidoNombre != null && a.ApellidoNombre.ToLower().Contains(filtro.ToLower())) ||
-                    (a.DNI != null && a.DNI.Contains(filtro)));
+                    (a.DNI != null && a.DNI.Contains(filtro)) ||
+                    (a.NumeroAfiliado != null && a.NumeroAfiliado.Contains(filtro)));
 
             // Crear lista anónima con fechas de último recetario y próxima habilitación
             var lista = new List<dynamic>();
@@ -113,15 +116,20 @@ namespace Centro_Empleado
                 DateTime? ultima = recetarios.Count > 0 ? (DateTime?)recetarios[0].FechaEmision : null;
                 DateTime? proxima = dbManager.FechaProximaHabilitacion(a.Id);
                 
+                // Verificar si tiene recetas extraordinarias este mes
+                bool tieneExtraordinaria = dbManager.YaImprimioRecetaExtraordinariaEsteMes(a.Id);
+                
                 lista.Add(new
                 {
                     a.Id,
                     a.ApellidoNombre,
                     a.DNI,
+                    a.NumeroAfiliado,
                     a.Empresa,
                     TieneFamiliar = a.TieneGrupoFamiliar ? "Sí" : "",
                     FechaUltimaImpresion = ultima.HasValue ? ultima.Value.ToString("dd/MM/yyyy") : "-",
-                    ProximaHabilitacion = proxima.HasValue ? proxima.Value.ToString("dd/MM/yyyy") : "-"
+                    ProximaHabilitacion = proxima.HasValue ? proxima.Value.ToString("dd/MM/yyyy") : "-",
+                    RecetaExtraordinaria = tieneExtraordinaria ? "Sí" : ""
                 });
             }
             dgvAfiliados.DataSource = null;
@@ -140,6 +148,10 @@ namespace Centro_Empleado
             {
                 dgvAfiliados.Columns["TieneFamiliar"].HeaderText = "Tiene familiar";
             }
+            if (dgvAfiliados.Columns.Contains("RecetaExtraordinaria"))
+            {
+                dgvAfiliados.Columns["RecetaExtraordinaria"].HeaderText = "Rec. Extraordinaria";
+            }
         }
 
         private void btnGuardar_Click(object sender, EventArgs e)
@@ -149,6 +161,7 @@ namespace Centro_Empleado
             {
                 ApellidoNombre = txtApellidoNombre.Text.Trim(),
                 DNI = txtDNI.Text.Trim(),
+                NumeroAfiliado = txtNumeroAfiliado.Text.Trim(),
                 Empresa = txtEmpresa.Text.Trim(),
                 TieneGrupoFamiliar = chkGrupoFamiliar.Checked
             };
@@ -162,7 +175,7 @@ namespace Centro_Empleado
                 }
                 catch (Exception ex)
                 {
-                    MessageBox.Show($"Error al guardar afiliado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    MessageBox.Show(string.Format("Error al guardar afiliado: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                 }
         }
 
@@ -175,6 +188,7 @@ namespace Centro_Empleado
                 Id = afiliadoSeleccionadoId.Value,
                 ApellidoNombre = txtApellidoNombre.Text.Trim(),
                 DNI = txtDNI.Text.Trim(),
+                NumeroAfiliado = txtNumeroAfiliado.Text.Trim(),
                 Empresa = txtEmpresa.Text.Trim(),
                 TieneGrupoFamiliar = chkGrupoFamiliar.Checked
             };
@@ -188,7 +202,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al actualizar afiliado: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                MessageBox.Show(string.Format("Error al actualizar afiliado: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -205,16 +219,16 @@ namespace Centro_Empleado
             bool tieneRecetarios = recetarios.Count > 0;
             
             // Crear mensaje de confirmación
-            string mensaje = $"¿Está seguro que desea eliminar al afiliado:\n\n";
-            mensaje += $"Nombre: {afiliado.ApellidoNombre}\n";
-            mensaje += $"DNI: {afiliado.DNI}\n";
-            mensaje += $"Empresa: {afiliado.Empresa}\n";
-            mensaje += $"Tipo: {(afiliado.TieneGrupoFamiliar ? "Grupo Familiar" : "Individual")}\n\n";
+            string mensaje = "¿Está seguro que desea eliminar al afiliado:\n\n";
+            mensaje += string.Format("Nombre: {0}\n", afiliado.ApellidoNombre);
+            mensaje += string.Format("DNI: {0}\n", afiliado.DNI);
+            mensaje += string.Format("Empresa: {0}\n", afiliado.Empresa);
+            mensaje += string.Format("Tipo: {0}\n\n", (afiliado.TieneGrupoFamiliar ? "Grupo Familiar" : "Individual"));
             
             if (tieneRecetarios)
             {
-                mensaje += $"⚠️ ADVERTENCIA: Este afiliado tiene {recetarios.Count} recetario(s) impreso(s).\n";
-                mensaje += $"Al eliminarlo, se eliminarán TODOS los recetarios asociados.\n\n";
+                mensaje += string.Format("⚠️ ADVERTENCIA: Este afiliado tiene {0} recetario(s) impreso(s).\n", recetarios.Count);
+                mensaje += "Al eliminarlo, se eliminarán TODOS los recetarios asociados.\n\n";
             }
             
             mensaje += "Esta acción NO se puede deshacer. ¿Desea continuar?";
@@ -229,7 +243,7 @@ namespace Centro_Empleado
                          string mensajeExito = "Afiliado eliminado correctamente";
                          if (tieneRecetarios)
                          {
-                             mensajeExito += $" junto con {recetarios.Count} recetario(s)";
+                             mensajeExito += string.Format(" junto con {0} recetario(s)", recetarios.Count);
                          }
                          mensajeExito += ".";
                          
@@ -248,7 +262,8 @@ namespace Centro_Empleado
                  }
                  catch (Exception ex)
                  {
-                     MessageBox.Show($"Error al eliminar afiliado: {ex.Message}\n\nDetalles técnicos: {ex.InnerException?.Message ?? "Sin detalles adicionales"}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                     string innerExceptionMessage = ex.InnerException != null ? ex.InnerException.Message : "Sin detalles adicionales";
+                     MessageBox.Show(string.Format("Error al eliminar afiliado: {0}\n\nDetalles técnicos: {1}", ex.Message, innerExceptionMessage), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                  }
             }
         }
@@ -264,16 +279,27 @@ namespace Centro_Empleado
                     var idProp = tipo.GetProperty("Id");
                     var nombreProp = tipo.GetProperty("ApellidoNombre");
                     var dniProp = tipo.GetProperty("DNI");
+                    var numeroAfiliadoProp = tipo.GetProperty("NumeroAfiliado");
                     var empresaProp = tipo.GetProperty("Empresa");
                     var tieneFamiliarProp = tipo.GetProperty("TieneFamiliar");
-                    if (idProp != null && nombreProp != null && dniProp != null && empresaProp != null && tieneFamiliarProp != null)
+                    if (idProp != null && nombreProp != null && dniProp != null && numeroAfiliadoProp != null && empresaProp != null && tieneFamiliarProp != null)
                     {
                         afiliadoSeleccionadoId = (int)idProp.GetValue(row);
-                        txtApellidoNombre.Text = nombreProp.GetValue(row)?.ToString() ?? "";
-                        txtDNI.Text = dniProp.GetValue(row)?.ToString() ?? "";
-                        txtEmpresa.Text = empresaProp.GetValue(row)?.ToString() ?? "";
+                        var nombreValue = nombreProp.GetValue(row);
+                        txtApellidoNombre.Text = nombreValue != null ? nombreValue.ToString() : "";
+                        
+                        var dniValue = dniProp.GetValue(row);
+                        txtDNI.Text = dniValue != null ? dniValue.ToString() : "";
+                        
+                        var numeroAfiliadoValue = numeroAfiliadoProp.GetValue(row);
+                        txtNumeroAfiliado.Text = numeroAfiliadoValue != null ? numeroAfiliadoValue.ToString() : "";
+                        
+                        var empresaValue = empresaProp.GetValue(row);
+                        txtEmpresa.Text = empresaValue != null ? empresaValue.ToString() : "";
+                        
                         // Si el valor es "Sí" entonces tiene grupo familiar
-                        chkGrupoFamiliar.Checked = (tieneFamiliarProp.GetValue(row)?.ToString() ?? "") == "Sí";
+                        var familiarValue = tieneFamiliarProp.GetValue(row);
+                        chkGrupoFamiliar.Checked = (familiarValue != null ? familiarValue.ToString() : "") == "Sí";
                         btnEditar.Enabled = true;
                         btnGuardar.Enabled = false;
                         editando = true;
@@ -324,6 +350,12 @@ namespace Centro_Empleado
                 txtDNI.Focus();
                 return false;
             }
+            if (string.IsNullOrWhiteSpace(txtNumeroAfiliado.Text))
+            {
+                MessageBox.Show("El número de afiliado es obligatorio", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                txtNumeroAfiliado.Focus();
+                return false;
+            }
             if (string.IsNullOrWhiteSpace(txtEmpresa.Text))
             {
                 MessageBox.Show("La empresa es obligatoria", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
@@ -337,6 +369,7 @@ namespace Centro_Empleado
         {
             txtApellidoNombre.Clear();
             txtDNI.Clear();
+            txtNumeroAfiliado.Clear();
             txtEmpresa.Clear();
             chkGrupoFamiliar.Checked = false;
             btnGuardar.Enabled = true;
@@ -440,7 +473,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al abrir el manual: {ex.Message}", 
+                MessageBox.Show(string.Format("Error al abrir el manual: {0}", ex.Message), 
                     "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
@@ -474,8 +507,8 @@ namespace Centro_Empleado
                     string mensaje = dbManager.LimpiarBaseDatos();
                     
                     MessageBox.Show(
-                        $"✅ LIMPIEZA COMPLETADA\n\n" +
-                        $"{mensaje}\n\n" +
+                        "✅ LIMPIEZA COMPLETADA\n\n" +
+                        string.Format("{0}\n\n", mensaje) +
                         "La base de datos está lista para crear el instalador.",
                         "Limpieza de Base de Datos",
                         MessageBoxButtons.OK,
@@ -488,8 +521,8 @@ namespace Centro_Empleado
             catch (Exception ex)
             {
                 MessageBox.Show(
-                    $"❌ ERROR EN LA LIMPIEZA\n\n" +
-                    $"Detalles: {ex.Message}",
+                    "❌ ERROR EN LA LIMPIEZA\n\n" +
+                    string.Format("Detalles: {0}", ex.Message),
                     "Error de Limpieza",
                     MessageBoxButtons.OK,
                     MessageBoxIcon.Error);
@@ -501,80 +534,232 @@ namespace Centro_Empleado
             var afiliado = dbManager.ObtenerTodosLosAfiliados().Find(a => a.Id == afiliadoSeleccionadoId.Value);
             if (afiliado == null) return;
 
-            // Control de recetarios mensuales
-            int maxRecetarios = afiliado.TieneGrupoFamiliar ? 4 : 2;
-            int recetariosEsteMes = dbManager.ContarRecetariosMensuales(afiliado.Id, DateTime.Now);
+            // Obtener recetarios disponibles con el nuevo sistema (máximo 3 por mes)
+            int recetariosDisponibles = dbManager.ObtenerRecetariosDisponibles(afiliado.Id);
             
-            if (recetariosEsteMes >= maxRecetarios)
+            if (recetariosDisponibles <= 0)
             {
-                DateTime? proxima = dbManager.FechaProximaHabilitacion(afiliado.Id);
+                DateTime? proxima = dbManager.FechaProximaHabilitacionRecetario(afiliado.Id);
                 string fechaProx = proxima.HasValue ? proxima.Value.ToString("dd/MM/yyyy") : "-";
-                MessageBox.Show($"Ya imprimió las recetas correspondientes al período. Podrá imprimir nuevamente a partir del: {fechaProx}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-
-            // Calcular cuántos recetarios imprimir
-            int recetariosAImprimir = maxRecetarios - recetariosEsteMes;
-            
-            // Solo permitir imprimir si hay recetas disponibles
-            if (recetariosAImprimir <= 0)
-            {
-                DateTime? proxima = dbManager.FechaProximaHabilitacion(afiliado.Id);
-                string fechaProx = proxima.HasValue ? proxima.Value.ToString("dd/MM/yyyy") : "-";
-                MessageBox.Show($"Ya imprimió las recetas correspondientes al período. Podrá imprimir nuevamente a partir del: {fechaProx}", "Aviso", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
-            }
-            
-            // Siempre imprimir 2 recetas por impresión (1 hoja)
-            // Para grupos familiares, quedan 2 pendientes para otra impresión
-            recetariosAImprimir = 2; // Siempre imprimir 2 recetas por impresión
-
-            string mensajeConfirmacion = $"¿Desea imprimir {recetariosAImprimir} recetas del afiliado {afiliado.ApellidoNombre}?";
-            
-            if (afiliado.TieneGrupoFamiliar && recetariosEsteMes == 0)
-            {
-                mensajeConfirmacion += "\n\nNota: Al ser grupo familiar, quedará 1 impresión adicional disponible (2 recetas más).";
-            }
-            
-            var confirm = MessageBox.Show(mensajeConfirmacion, "Confirmar impresión", MessageBoxButtons.YesNo, MessageBoxIcon.Question);
-            if (confirm == DialogResult.Yes)
-            {
-                try
+                
+                // Verificar si ya imprimió receta extraordinaria este mes
+                bool yaImprimioExtraordinaria = dbManager.YaImprimioRecetaExtraordinariaEsteMes(afiliado.Id);
+                
+                if (yaImprimioExtraordinaria)
                 {
-                    // Generar todos los recetarios necesarios
-                    var recetariosGenerados = new List<Models.Recetario>();
+                    // Obtener historial de recetas extraordinarias
+                    var historialExtraordinarias = dbManager.ObtenerHistorialRecetasExtraordinarias(afiliado.Id);
+                    var ultimaExtraordinaria = historialExtraordinarias.FirstOrDefault();
                     
-                    // Obtener 2 números consecutivos para la impresión
-                    var numeros = dbManager.ObtenerDosNumerosConsecutivos();
-                    List<int> numerosTalonario = new List<int> { numeros.primero, numeros.segundo };
-                    
-                    for (int i = 0; i < recetariosAImprimir; i++)
+                    string mensaje = "No hay recetarios disponibles este mes.\n";
+                    mensaje += string.Format("El próximo se habilitará el: {0}\n\n", fechaProx);
+                    mensaje += "Ya imprimió una receta extraordinaria este mes.\n";
+                    if (ultimaExtraordinaria != null)
                     {
-                        var recetario = new Models.Recetario
-                        {
-                            NumeroTalonario = numerosTalonario[i],
-                            IdAfiliado = afiliado.Id,
-                            FechaEmision = DateTime.Now,
-                            FechaVencimiento = DateTime.Now.AddMonths(1)
-                        };
-                        
-                        dbManager.InsertarRecetario(recetario);
-                        recetariosGenerados.Add(recetario);
+                        mensaje += string.Format("Última receta extraordinaria: {0:dd/MM/yyyy} - Motivo: {1}\n\n", 
+                            ultimaExtraordinaria.FechaImpresion, ultimaExtraordinaria.Motivo);
                     }
-
-                    // Generar HTML con todas las recetas
-                    var recetarioManager = new RecetarioManager();
-                    recetarioManager.GenerarHTMLConRecetas(recetariosGenerados, afiliado);
+                    mensaje += "¿Desea ver el historial completo de recetas extraordinarias?";
                     
-                    MessageBox.Show($"Se generaron {recetariosAImprimir} recetarios correctamente.", "Impresión exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                    
-                    // Recargar la lista de afiliados para mostrar la información actualizada
-                    CargarAfiliados();
+                    var resultado = MessageBox.Show(mensaje, "Recetarios Agotados", MessageBoxButtons.YesNo, MessageBoxIcon.Information);
+                    if (resultado == DialogResult.Yes)
+                    {
+                        using (var frmHistorial = new frmHistorialExtraordinarias(afiliado.Id, afiliado.ApellidoNombre))
+                        {
+                            frmHistorial.ShowDialog();
+                        }
+                    }
                 }
-                catch (Exception ex)
+                else
                 {
-                    MessageBox.Show($"Error al generar los recetarios: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    // Preguntar si desea solicitar receta extraordinaria
+                    var resultado = MessageBox.Show(
+                        string.Format("No hay recetarios disponibles este mes. El próximo se habilitará el: {0}\n\n¿Desea solicitar una receta extraordinaria?", fechaProx), 
+                        "Recetarios Agotados", 
+                        MessageBoxButtons.YesNo, 
+                        MessageBoxIcon.Question);
+                    
+                    if (resultado == DialogResult.Yes)
+                    {
+                        // Mostrar formulario de receta extraordinaria
+                        using (var frmExtraordinaria = new frmRecetaExtraordinaria(afiliado.ApellidoNombre))
+                        {
+                            if (frmExtraordinaria.ShowDialog() == DialogResult.OK && frmExtraordinaria.Aprobado)
+                            {
+                                ImprimirRecetaExtraordinaria(afiliado, frmExtraordinaria.Motivo);
+                            }
+                        }
+                    }
                 }
+                return;
+            }
+            
+            // Mostrar formulario de selección de cantidad
+            using (var frmSeleccion = new frmSeleccionRecetarios(recetariosDisponibles))
+            {
+                if (frmSeleccion.ShowDialog() == DialogResult.OK)
+                {
+                    int recetariosAImprimir = frmSeleccion.CantidadSeleccionada;
+                    bool imprimirDosPorHoja = frmSeleccion.ImprimirDosPorHoja;
+                    
+                    try
+                    {
+                        // Generar todos los recetarios necesarios
+                        var recetariosGenerados = new List<Models.Recetario>();
+                        
+                        // Obtener números consecutivos para la impresión
+                        var numerosAdicionales = dbManager.ObtenerNumerosAdicionales(recetariosAImprimir);
+                        
+                        for (int i = 0; i < recetariosAImprimir; i++)
+                        {
+                            var recetario = new Models.Recetario
+                            {
+                                NumeroTalonario = numerosAdicionales[i],
+                                IdAfiliado = afiliado.Id,
+                                FechaEmision = DateTime.Now,
+                                FechaVencimiento = DateTime.Now.AddMonths(1)
+                            };
+                            
+                            dbManager.InsertarRecetario(recetario);
+                            
+                            // Registrar el recetario impreso en el sistema mensual
+                            dbManager.RegistrarRecetarioImpreso(afiliado.Id, numerosAdicionales[i]);
+                            
+                            recetariosGenerados.Add(recetario);
+                        }
+
+                        // Generar HTML con todas las recetas
+                        var recetarioManager = new RecetarioManager();
+                        
+                        // Caso especial: si se seleccionaron 3 recetarios, imprimir 2 primero y luego 1
+                        if (recetariosAImprimir == 3)
+                        {
+                            // Primera impresión: 2 recetarios
+                            var primerosDos = recetariosGenerados.Take(2).ToList();
+                            recetarioManager.GenerarHTMLConRecetas(primerosDos, afiliado, true);
+                            
+                            // Segunda impresión: 1 recetario
+                            var ultimo = recetariosGenerados.Skip(2).Take(1).ToList();
+                            recetarioManager.GenerarHTMLConRecetas(ultimo, afiliado, false);
+                            
+                            MessageBox.Show("Se generaron 3 recetarios correctamente: 2 en la primera hoja y 1 en la segunda.", "Impresión exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        else
+                        {
+                            // Caso normal: usar la configuración seleccionada
+                            recetarioManager.GenerarHTMLConRecetas(recetariosGenerados, afiliado, imprimirDosPorHoja);
+                            MessageBox.Show(string.Format("Se generaron {0} recetarios correctamente.", recetariosAImprimir), "Impresión exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        }
+                        
+                        // Recargar la lista de afiliados para mostrar la información actualizada
+                        CargarAfiliados();
+                    }
+                    catch (Exception ex)
+                    {
+                        MessageBox.Show(string.Format("Error al generar los recetarios: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+        }
+
+        private void ImprimirRecetaExtraordinaria(Models.Afiliado afiliado, string motivo)
+        {
+            try
+            {
+                // Obtener un número de recetario
+                var numerosAdicionales = dbManager.ObtenerNumerosAdicionales(1);
+                int numeroRecetario = numerosAdicionales[0];
+                
+                // Crear el recetario extraordinario
+                var recetario = new Models.Recetario
+                {
+                    NumeroTalonario = numeroRecetario,
+                    IdAfiliado = afiliado.Id,
+                    FechaEmision = DateTime.Now,
+                    FechaVencimiento = DateTime.Now.AddMonths(1)
+                };
+                
+                // Insertar en la base de datos
+                dbManager.InsertarRecetario(recetario);
+                
+                // Registrar como recetario extraordinario
+                dbManager.RegistrarRecetarioExtraordinario(afiliado.Id, numeroRecetario, motivo);
+                
+                // Generar HTML (solo 1 recetario)
+                var recetariosList = new List<Models.Recetario> { recetario };
+                var recetarioManager = new RecetarioManager();
+                recetarioManager.GenerarHTMLConRecetas(recetariosList, afiliado, false);
+                
+                MessageBox.Show(string.Format("Se generó la receta extraordinaria correctamente.\nMotivo: {0}", motivo), 
+                    "Receta Extraordinaria Aprobada", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                
+                // Recargar la lista de afiliados
+                CargarAfiliados();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Error al generar la receta extraordinaria: {0}", ex.Message), 
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
+        private void txtDNI_KeyPress(object sender, KeyPressEventArgs e)
+        {
+            // Solo permitir números y teclas de control (Backspace, Delete, etc.)
+            if (!char.IsControl(e.KeyChar) && !char.IsDigit(e.KeyChar))
+            {
+                e.Handled = true; // Cancelar el carácter
+            }
+        }
+
+        private void btnRecetaExtraordinaria_Click(object sender, EventArgs e)
+        {
+            if (afiliadoSeleccionadoId == null)
+            {
+                MessageBox.Show("Debe seleccionar un afiliado primero.", "Selección requerida", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var afiliado = dbManager.ObtenerTodosLosAfiliados().Find(a => a.Id == afiliadoSeleccionadoId.Value);
+            if (afiliado == null) return;
+
+            // Verificar si ya imprimió receta extraordinaria este mes
+            bool yaImprimioExtraordinaria = dbManager.YaImprimioRecetaExtraordinariaEsteMes(afiliado.Id);
+            
+            if (yaImprimioExtraordinaria)
+            {
+                MessageBox.Show("Este afiliado ya imprimió una receta extraordinaria este mes.", 
+                    "Receta Extraordinaria No Disponible", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+
+            // Mostrar formulario de receta extraordinaria
+            using (var frmExtraordinaria = new frmRecetaExtraordinaria(afiliado.ApellidoNombre))
+            {
+                if (frmExtraordinaria.ShowDialog() == DialogResult.OK && frmExtraordinaria.Aprobado)
+                {
+                    ImprimirRecetaExtraordinaria(afiliado, frmExtraordinaria.Motivo);
+                }
+            }
+        }
+
+        private void btnHistorialExtraordinarias_Click(object sender, EventArgs e)
+        {
+            if (afiliadoSeleccionadoId == null)
+            {
+                MessageBox.Show("Debe seleccionar un afiliado primero.", "Selección requerida", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+
+            var afiliado = dbManager.ObtenerTodosLosAfiliados().Find(a => a.Id == afiliadoSeleccionadoId.Value);
+            if (afiliado == null) return;
+
+            // Mostrar formulario de historial
+            using (var frmHistorial = new frmHistorialExtraordinarias(afiliado.Id, afiliado.ApellidoNombre))
+            {
+                frmHistorial.ShowDialog();
             }
         }
     }

@@ -26,11 +26,11 @@ namespace Centro_Empleado
         }
 
         // Nuevo método para generar HTML con múltiples recetas
-        public void GenerarHTMLConRecetas(List<Recetario> recetarios, Afiliado afiliado)
+        public void GenerarHTMLConRecetas(List<Recetario> recetarios, Afiliado afiliado, bool imprimirDosPorHoja = true)
         {
             try
             {
-                string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "recetaFinal.html");
+                string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "recetaFinal.html");
                 if (!File.Exists(templatePath))
                 {
                     throw new FileNotFoundException("No se encontró la plantilla HTML de receta.");
@@ -39,48 +39,85 @@ namespace Centro_Empleado
                 string templateHtml = File.ReadAllText(templatePath);
                 string htmlFinal = "";
 
-                // Procesar recetarios en pares (2 por página)
-                for (int i = 0; i < recetarios.Count; i += 2)
+                // Procesar recetarios según la configuración de impresión
+                if (imprimirDosPorHoja)
                 {
-                    // Crear una copia del template para esta página
-                    string htmlPagina = templateHtml;
-                    
-                    // Primera receta de la página
-                    var recetario1 = recetarios[i];
-                    htmlPagina = ReemplazarPlaceholdersPrimeraReceta(htmlPagina, recetario1, afiliado);
-                    
-                    // Segunda receta de la página (si existe)
-                    if (i + 1 < recetarios.Count)
+                    // Imprimir 2 por hoja
+                    for (int i = 0; i < recetarios.Count; i += 2)
                     {
-                        var recetario2 = recetarios[i + 1];
-                        htmlPagina = ReemplazarPlaceholdersSegundaReceta(htmlPagina, recetario2, afiliado);
+                        // Crear una copia del template para esta página
+                        string htmlPagina = templateHtml;
+                        
+                        // Primera receta de la página
+                        var recetario1 = recetarios[i];
+                        htmlPagina = ReemplazarPlaceholdersPrimeraReceta(htmlPagina, recetario1, afiliado);
+                        
+                        // Segunda receta de la página (si existe)
+                        if (i + 1 < recetarios.Count)
+                        {
+                            var recetario2 = recetarios[i + 1];
+                            htmlPagina = ReemplazarPlaceholdersSegundaReceta(htmlPagina, recetario2, afiliado);
+                        }
+                        else
+                        {
+                            // Si no hay segunda receta, usar los mismos datos del primer recetario
+                            htmlPagina = ReemplazarPlaceholdersSegundaReceta(htmlPagina, recetario1, afiliado);
+                        }
+                        
+                        // Corregir la ruta del logo
+                        htmlPagina = CorregirRutaLogo(htmlPagina);
+                        
+                        // Agregar comentario de depuración
+                        htmlPagina = htmlPagina.Replace("</head>", "<!-- MODO: 2 RECETARIOS POR HOJA -->\n</head>");
+                        
+                        htmlFinal += htmlPagina;
+                        
+                        // Agregar salto de página si no es la última página
+                        if (i + 2 < recetarios.Count)
+                        {
+                            htmlFinal += "<div style='page-break-before: always;'></div>";
+                        }
                     }
-                    else
+                }
+                else
+                {
+                    // Imprimir 1 por hoja
+                    for (int i = 0; i < recetarios.Count; i++)
                     {
-                        // Si no hay segunda receta, limpiar el segundo formulario
+                        // Crear una copia del template para esta página
+                        string htmlPagina = templateHtml;
+                        
+                        // Solo la primera receta
+                        var recetario1 = recetarios[i];
+                        htmlPagina = ReemplazarPlaceholdersPrimeraReceta(htmlPagina, recetario1, afiliado);
+                        
+                        // Limpiar el segundo formulario para que quede en blanco
                         htmlPagina = LimpiarSegundoFormulario(htmlPagina);
-                    }
-                    
-                    // Corregir la ruta del logo para que sea relativa
-                    htmlPagina = CorregirRutaLogo(htmlPagina);
-                    
-                    htmlFinal += htmlPagina;
-                    
-                    // Agregar salto de página si no es la última página
-                    if (i + 2 < recetarios.Count)
-                    {
-                        htmlFinal += "<div style='page-break-before: always;'></div>";
+                        
+                        // Agregar comentario de depuración
+                        htmlPagina = htmlPagina.Replace("</head>", "<!-- MODO: 1 RECETARIO POR HOJA -->\n</head>");
+                        
+                        // Corregir la ruta del logo
+                        htmlPagina = CorregirRutaLogo(htmlPagina);
+                        
+                        htmlFinal += htmlPagina;
+                        
+                        // Agregar salto de página si no es la última página
+                        if (i + 1 < recetarios.Count)
+                        {
+                            htmlFinal += "<div style='page-break-before: always;'></div>";
+                        }
                     }
                 }
 
                 // Guardar y abrir el archivo HTML
-                string tempFile = Path.Combine(Path.GetTempPath(), $"recetas_{afiliado.Id}_{DateTime.Now.Ticks}.html");
+                string tempFile = Path.Combine(Path.GetTempPath(), string.Format("recetas_{0}_{1}.html", afiliado.Id, DateTime.Now.Ticks));
                 File.WriteAllText(tempFile, htmlFinal);
                 Process.Start(new ProcessStartInfo(tempFile) { UseShellExecute = true });
             }
             catch (Exception ex)
             {
-                throw new Exception($"Error al generar el archivo HTML: {ex.Message}", ex);
+                throw new Exception(string.Format("Error al generar el archivo HTML: {0}", ex.Message), ex);
             }
         }
 
@@ -123,8 +160,13 @@ namespace Centro_Empleado
                 html = html.Replace(placeholder, "");
             }
             
+            // Ocultar completamente el segundo formulario
+            html = html.Replace("<div class=\"form-container\" id=\"segundo-formulario\">", 
+                               "<div class=\"form-container\" id=\"segundo-formulario\" style=\"display: none !important;\">");
+            
             return html;
         }
+
 
         private string CorregirRutaLogo(string html)
         {

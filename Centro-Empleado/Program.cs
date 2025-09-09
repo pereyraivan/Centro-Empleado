@@ -22,7 +22,7 @@ namespace Centro_Empleado
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error al iniciar la aplicación:\n\n{ex.Message}\n\nDetalles:\n{ex.ToString()}", 
+                MessageBox.Show(string.Format("Error al iniciar la aplicación:\n\n{0}\n\nDetalles:\n{1}", ex.Message, ex.ToString()), 
                     "Error de Inicio", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }

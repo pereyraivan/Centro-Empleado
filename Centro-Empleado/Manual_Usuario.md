@@ -19,11 +19,13 @@ El Sistema Centro de Empleados de Comercio es una aplicación desarrollada para 
 
 ### Características Principales
 - ✅ Gestión completa de afiliados
-- ✅ Impresión de recetas médicas mensuales
+- ✅ Sistema de recetas mensuales (3 por afiliado por mes)
+- ✅ Sistema de recetas extraordinarias (1 por afiliado por mes)
 - ✅ Sistema de bonos de cobro
 - ✅ Control de caja diaria
 - ✅ Base de datos SQLite integrada
 - ✅ Interfaz intuitiva y fácil de usar
+- ✅ Historial completo de recetas extraordinarias
 
 ---
 
@@ -59,6 +61,16 @@ El sistema incluye un panel de operaciones con las siguientes opciones:
 - Busca afiliados por DNI
 - Imprime orden de consulta
 
+#### ⚠️ **Receta Extraordinaria**
+- Permite solicitar recetas extraordinarias para casos especiales
+- Requiere motivo obligatorio
+- Límite de 1 receta extraordinaria por afiliado por mes
+
+#### 📋 **Historial Extraordinarias**
+- Muestra el historial completo de recetas extraordinarias
+- Incluye fecha, número de recetario y motivo
+- Solo disponible para afiliados seleccionados
+
 #### 📖 **Manual**
 - Descarga el manual de usuario en PDF
 - Acceso rápido a la documentación
@@ -70,7 +82,8 @@ El sistema incluye un panel de operaciones con las siguientes opciones:
 ### Agregar Nuevo Afiliado
 1. Hacer clic en **"Nuevo Afiliado"**
 2. Completar los campos obligatorios:
-   - **DNI**: Número de documento (obligatorio)
+   - **DNI**: Número de documento (obligatorio, solo números)
+   - **Número de Afiliado**: Número único del afiliado (obligatorio)
    - **Apellido y Nombre**: Nombre completo del afiliado
    - **Empresa**: Empresa donde trabaja
 3. Hacer clic en **"Guardar"**
@@ -92,19 +105,30 @@ El sistema incluye un panel de operaciones con las siguientes opciones:
 
 ---
 
-## Impresión de Recetas
+## Sistema de Recetas
 
-### Generar Receta Mensual
+### Recetas Mensuales (3 por mes)
 1. Buscar el afiliado por DNI
-2. Verificar que el afiliado esté habilitado para imprimir
-3. Hacer clic en **"Imprimir Receta"**
-4. La receta se abrirá en el navegador predeterminado
-5. Imprimir desde el navegador
+2. Hacer clic en **"Imprimir"**
+3. Seleccionar cantidad de recetas (1, 2 o 3)
+4. Elegir formato de impresión:
+   - **1 por hoja**: Una receta por página
+   - **2 por hoja**: Dos recetas por página
+5. Confirmar la impresión
+6. Las recetas se abrirán en el navegador
 
-### Límite Mensual
-- Cada afiliado puede imprimir **1 receta por mes**
-- El sistema controla automáticamente el límite
-- Se reinicia el contador el primer día de cada mes
+### Recetas Extraordinarias (1 por mes)
+1. Seleccionar un afiliado de la lista
+2. Hacer clic en **"⚠️ Receta Extraordinaria"** en el panel de operaciones
+3. Ingresar motivo obligatorio
+4. Hacer clic en **"Aprobar"**
+5. La receta se generará automáticamente
+
+### Límites del Sistema
+- **Recetas mensuales**: Máximo 3 por afiliado por mes
+- **Recetas extraordinarias**: Máximo 1 por afiliado por mes
+- **Control automático**: El sistema verifica límites antes de permitir impresión
+- **Reinicio mensual**: Los contadores se reinician automáticamente
 
 ### Formato de Receta
 La receta incluye:
@@ -113,6 +137,22 @@ La receta incluye:
 - Número de receta único
 - Fecha de emisión y vencimiento
 - Espacios para medicamentos y cantidades
+
+### Historial de Recetas Extraordinarias
+1. Seleccionar un afiliado de la lista
+2. Hacer clic en **"📋 Historial Extraordinarias"** en el panel de operaciones
+3. Ver el historial completo que incluye:
+   - **Fecha y hora** de cada receta extraordinaria
+   - **Número de recetario** generado
+   - **Motivo** de la solicitud
+4. Usar **"Actualizar"** para refrescar la información
+5. Hacer clic en **"Cerrar"** para salir
+
+### Indicadores en la Lista de Afiliados
+La grilla principal muestra:
+- **Columna "Rec. Extraordinaria"**: Indica "Sí" si el afiliado imprimió una receta extraordinaria este mes
+- **Columna "Próxima habilitación"**: Muestra cuándo se habilitará el próximo recetario
+- **Columna "Última impresión"**: Fecha de la última receta impresa
 
 ---
 
