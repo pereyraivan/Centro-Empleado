@@ -52,6 +52,8 @@ namespace Centro_Empleado
             this.panelOperaciones = new System.Windows.Forms.Panel();
             this.btnHistorialExtraordinarias = new System.Windows.Forms.Button();
             this.btnRecetaExtraordinaria = new System.Windows.Forms.Button();
+            this.btnCambiarContrasena = new System.Windows.Forms.Button();
+            this.btnRespaldo = new System.Windows.Forms.Button();
             this.btnManual = new System.Windows.Forms.Button();
             this.btnImprimirCupon = new System.Windows.Forms.Button();
             this.btnVerCaja = new System.Windows.Forms.Button();
@@ -301,12 +303,14 @@ namespace Centro_Empleado
             this.panelOperaciones.BorderStyle = System.Windows.Forms.BorderStyle.FixedSingle;
             this.panelOperaciones.Controls.Add(this.btnHistorialExtraordinarias);
             this.panelOperaciones.Controls.Add(this.btnRecetaExtraordinaria);
+            this.panelOperaciones.Controls.Add(this.btnCambiarContrasena);
+            this.panelOperaciones.Controls.Add(this.btnRespaldo);
             this.panelOperaciones.Controls.Add(this.btnManual);
             this.panelOperaciones.Controls.Add(this.btnImprimirCupon);
             this.panelOperaciones.Controls.Add(this.btnVerCaja);
             this.panelOperaciones.Location = new System.Drawing.Point(4, 43);
             this.panelOperaciones.Name = "panelOperaciones";
-            this.panelOperaciones.Size = new System.Drawing.Size(218, 169);
+            this.panelOperaciones.Size = new System.Drawing.Size(256, 231);
             this.panelOperaciones.TabIndex = 16;
             this.panelOperaciones.Visible = false;
             // 
@@ -315,9 +319,9 @@ namespace Centro_Empleado
             this.btnHistorialExtraordinarias.BackColor = System.Drawing.Color.MediumTurquoise;
             this.btnHistorialExtraordinarias.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
             this.btnHistorialExtraordinarias.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.btnHistorialExtraordinarias.Location = new System.Drawing.Point(5, 129);
+            this.btnHistorialExtraordinarias.Location = new System.Drawing.Point(5, 191);
             this.btnHistorialExtraordinarias.Name = "btnHistorialExtraordinarias";
-            this.btnHistorialExtraordinarias.Size = new System.Drawing.Size(208, 30);
+            this.btnHistorialExtraordinarias.Size = new System.Drawing.Size(246, 30);
             this.btnHistorialExtraordinarias.TabIndex = 4;
             this.btnHistorialExtraordinarias.Text = "📋 Historial Extraordinarias";
             this.btnHistorialExtraordinarias.UseVisualStyleBackColor = false;
@@ -329,10 +333,34 @@ namespace Centro_Empleado
             this.btnRecetaExtraordinaria.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnRecetaExtraordinaria.Location = new System.Drawing.Point(5, 98);
             this.btnRecetaExtraordinaria.Name = "btnRecetaExtraordinaria";
-            this.btnRecetaExtraordinaria.Size = new System.Drawing.Size(208, 30);
+            this.btnRecetaExtraordinaria.Size = new System.Drawing.Size(246, 30);
             this.btnRecetaExtraordinaria.TabIndex = 3;
             this.btnRecetaExtraordinaria.Text = "⚠️ Receta Extraordinaria";
             this.btnRecetaExtraordinaria.UseVisualStyleBackColor = false;
+            // 
+            // btnCambiarContrasena
+            // 
+            this.btnCambiarContrasena.BackColor = System.Drawing.Color.NavajoWhite;
+            this.btnCambiarContrasena.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnCambiarContrasena.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnCambiarContrasena.Location = new System.Drawing.Point(5, 129);
+            this.btnCambiarContrasena.Name = "btnCambiarContrasena";
+            this.btnCambiarContrasena.Size = new System.Drawing.Size(246, 30);
+            this.btnCambiarContrasena.TabIndex = 5;
+            this.btnCambiarContrasena.Text = "🔐 Cambiar Contraseña";
+            this.btnCambiarContrasena.UseVisualStyleBackColor = false;
+            // 
+            // btnRespaldo
+            // 
+            this.btnRespaldo.BackColor = System.Drawing.Color.LightBlue;
+            this.btnRespaldo.FlatStyle = System.Windows.Forms.FlatStyle.Flat;
+            this.btnRespaldo.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
+            this.btnRespaldo.Location = new System.Drawing.Point(5, 160);
+            this.btnRespaldo.Name = "btnRespaldo";
+            this.btnRespaldo.Size = new System.Drawing.Size(246, 30);
+            this.btnRespaldo.TabIndex = 6;
+            this.btnRespaldo.Text = "💾 Crear Respaldo";
+            this.btnRespaldo.UseVisualStyleBackColor = false;
             // 
             // btnManual
             // 
@@ -341,7 +369,7 @@ namespace Centro_Empleado
             this.btnManual.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnManual.Location = new System.Drawing.Point(5, 67);
             this.btnManual.Name = "btnManual";
-            this.btnManual.Size = new System.Drawing.Size(208, 30);
+            this.btnManual.Size = new System.Drawing.Size(246, 30);
             this.btnManual.TabIndex = 2;
             this.btnManual.Text = "📖 Manual";
             this.btnManual.UseVisualStyleBackColor = false;
@@ -353,7 +381,7 @@ namespace Centro_Empleado
             this.btnImprimirCupon.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnImprimirCupon.Location = new System.Drawing.Point(5, 36);
             this.btnImprimirCupon.Name = "btnImprimirCupon";
-            this.btnImprimirCupon.Size = new System.Drawing.Size(208, 30);
+            this.btnImprimirCupon.Size = new System.Drawing.Size(246, 30);
             this.btnImprimirCupon.TabIndex = 1;
             this.btnImprimirCupon.Text = "🏥 Imprimir Bono";
             this.btnImprimirCupon.UseVisualStyleBackColor = false;
@@ -365,7 +393,7 @@ namespace Centro_Empleado
             this.btnVerCaja.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnVerCaja.Location = new System.Drawing.Point(5, 5);
             this.btnVerCaja.Name = "btnVerCaja";
-            this.btnVerCaja.Size = new System.Drawing.Size(208, 30);
+            this.btnVerCaja.Size = new System.Drawing.Size(246, 30);
             this.btnVerCaja.TabIndex = 0;
             this.btnVerCaja.Text = "💰 Ver Caja";
             this.btnVerCaja.UseVisualStyleBackColor = false;
@@ -435,6 +463,8 @@ namespace Centro_Empleado
         private System.Windows.Forms.Button btnManual;
         private System.Windows.Forms.Button btnRecetaExtraordinaria;
         private System.Windows.Forms.Button btnHistorialExtraordinarias;
+        private System.Windows.Forms.Button btnCambiarContrasena;
+        private System.Windows.Forms.Button btnRespaldo;
 
     }
 }

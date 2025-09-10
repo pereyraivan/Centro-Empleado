@@ -7,13 +7,11 @@ namespace Centro_Empleado
     public partial class frmSeleccionRecetarios : Form
     {
         public int CantidadSeleccionada { get; private set; }
-        public bool ImprimirDosPorHoja { get; private set; }
 
         public frmSeleccionRecetarios(int recetariosDisponibles)
         {
             InitializeComponent();
             CantidadSeleccionada = 0;
-            ImprimirDosPorHoja = false;
             
             // Actualizar el texto del label de disponibles
             lblDisponibles.Text = string.Format("Recetarios disponibles este mes: {0}", recetariosDisponibles);
@@ -53,29 +51,13 @@ namespace Centro_Empleado
             // Solo procesar si el control está habilitado
             if (!nudCantidad.Enabled) return;
             
-            int cantidad = (int)nudCantidad.Value;
-            
-            // Actualizar el estado del checkbox según la cantidad
-            chkDosPorHoja.Enabled = cantidad >= 2;
-            if (cantidad < 2)
-            {
-                chkDosPorHoja.Checked = false;
-            }
-        }
-
-        private void chkDosPorHoja_CheckedChanged(object sender, EventArgs e)
-        {
-            // Si está marcado, asegurar que la cantidad sea par
-            if (chkDosPorHoja.Checked && nudCantidad.Value % 2 != 0)
-            {
-                nudCantidad.Value = nudCantidad.Value + 1;
-            }
+            // No se requiere lógica adicional ya que el sistema maneja automáticamente
+            // la impresión de 3 recetarios por afiliado
         }
 
         private void btnAceptar_Click(object sender, EventArgs e)
         {
             CantidadSeleccionada = (int)nudCantidad.Value;
-            ImprimirDosPorHoja = chkDosPorHoja.Checked;
             this.DialogResult = DialogResult.OK;
             this.Close();
         }

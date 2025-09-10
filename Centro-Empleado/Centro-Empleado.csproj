@@ -152,6 +152,18 @@
     <Compile Include="frmHistorialExtraordinarias.Designer.cs">
       <DependentUpon>frmHistorialExtraordinarias.cs</DependentUpon>
     </Compile>
+    <Compile Include="frmIngresarContrasena.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmIngresarContrasena.Designer.cs">
+      <DependentUpon>frmIngresarContrasena.cs</DependentUpon>
+    </Compile>
+    <Compile Include="frmCambiarContrasena.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frmCambiarContrasena.Designer.cs">
+      <DependentUpon>frmCambiarContrasena.cs</DependentUpon>
+    </Compile>
     <Compile Include="Models\Afiliado.cs" />
     <Compile Include="Models\Bono.cs" />
     <Compile Include="Models\Familiar.cs" />
@@ -162,6 +174,9 @@
     <Compile Include="SqlServerTypes\Loader.cs" />
     <EmbeddedResource Include="frmAfiliado.resx">
       <DependentUpon>frmAfiliado.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="frmIngresarContrasena.resx">
+      <DependentUpon>frmIngresarContrasena.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="frmPruebas.resx">
       <DependentUpon>frmPruebas.cs</DependentUpon>

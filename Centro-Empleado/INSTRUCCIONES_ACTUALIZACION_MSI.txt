@@ -1,0 +1,62 @@
+========================================
+    INSTRUCCIONES DE ACTUALIZACION
+    Sistema Centro de Empleados
+========================================
+
+IMPORTANTE: Antes de instalar la nueva versión, 
+RECOMENDAMOS crear un respaldo manual de sus datos 
+para mayor seguridad.
+
+PASOS PARA ACTUALIZAR:
+
+1. CREAR RESPALDO DE SEGURIDAD (RECOMENDADO)
+   - Abrir el sistema actual
+   - Hacer clic en "💾 Crear Respaldo" en el panel de operaciones
+   - Confirmar la creación del respaldo
+   - Esperar a que se complete el proceso
+
+2. CERRAR LA APLICACIÓN
+   - Cerrar completamente el sistema Centro de Empleados
+   - Verificar que no esté ejecutándose en segundo plano
+
+3. INSTALAR LA NUEVA VERSIÓN
+   - Ejecutar el archivo .msi de la nueva versión
+   - Seguir las instrucciones del instalador
+   - El instalador reemplazará la versión anterior
+
+4. VERIFICAR LA INSTALACIÓN
+   - Abrir el sistema actualizado
+   - Verificar que todos los datos están presentes
+   - Si algo falta, contactar al soporte técnico
+
+RESPALDO MANUAL:
+- Los respaldos se crean solo cuando el usuario lo solicita
+- Los respaldos se guardan en la carpeta "Backups"
+- Se recomienda crear respaldo antes de actualizaciones importantes
+
+EN CASO DE PROBLEMAS:
+
+Si después de la actualización faltan datos:
+1. Buscar en la carpeta "Backups" el archivo más reciente
+2. Contactar al soporte técnico con esa información
+3. El soporte puede restaurar los datos desde el respaldo
+
+ARCHIVOS IMPORTANTES:
+- CentroEmpleado.db: Base de datos principal
+- Backups/: Carpeta con respaldos automáticos
+- config.txt: Configuración del sistema
+
+NUEVAS FUNCIONALIDADES EN ESTA VERSIÓN:
+- Sistema de contraseñas para recetas extraordinarias
+- Respaldo automático de base de datos
+- Mejoras en la interfaz de usuario
+- Validaciones adicionales
+
+SOPORTE TÉCNICO:
+- Email: soporte@centroempleados.com
+- Teléfono: (011) 1234-5678
+- Horario: Lunes a Viernes 9:00 a 18:00
+
+========================================
+    ¡Gracias por usar nuestro sistema!
+========================================

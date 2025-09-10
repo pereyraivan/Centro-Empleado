@@ -1,0 +1,54 @@
+========================================
+    INSTRUCCIONES DE ACTUALIZACION
+    Sistema Centro de Empleados v2.0
+========================================
+
+IMPORTANTE: Este paquete contiene una actualización del sistema.
+Sus datos están seguros y NO se perderán.
+
+PASOS PARA ACTUALIZAR:
+
+1. CERRAR LA APLICACIÓN
+   - Cerrar completamente el sistema Centro de Empleados
+   - Verificar que no esté ejecutándose en segundo plano
+
+2. CREAR RESPALDO DE SEGURIDAD
+   - Ejecutar: backup_database.bat
+   - Esto creará una copia de seguridad de sus datos
+
+3. ACTUALIZAR EL SISTEMA
+   - Ejecutar: actualizar_sistema.bat
+   - Seguir las instrucciones en pantalla
+   - El proceso es automático y seguro
+
+4. VERIFICAR LA ACTUALIZACION
+   - Abrir el sistema actualizado
+   - Verificar que todos los datos están presentes
+   - Probar las nuevas funcionalidades
+
+EN CASO DE PROBLEMAS:
+
+Si algo sale mal durante la actualización:
+1. Ejecutar: restaurar_respaldo.bat
+2. Seleccionar el respaldo más reciente
+3. Contactar al soporte técnico
+
+ARCHIVOS IMPORTANTES:
+- CentroEmpleado.db: Base de datos (NO TOCAR)
+- config.txt: Configuración (NO TOCAR)
+- Backups/: Respaldos de seguridad
+
+NUEVAS FUNCIONALIDADES EN ESTA VERSION:
+- Sistema de contraseñas para recetas extraordinarias
+- Respaldo automático de base de datos
+- Mejoras en la interfaz de usuario
+- Validaciones adicionales
+
+SOPORTE TECNICO:
+- Email: soporte@centroempleados.com
+- Teléfono: (011) 1234-5678
+- Horario: Lunes a Viernes 9:00 a 18:00
+
+========================================
+    ¡Gracias por usar nuestro sistema!
+========================================

@@ -26,6 +26,8 @@ namespace Centro_Empleado
                 btnEditar.Enabled = false;
                 btnEliminar.Enabled = false;
                 btnImprimir.Enabled = false;
+                
+                // El respaldo se hace solo manualmente para evitar interrupciones
             }
             catch (Exception ex)
             {
@@ -44,6 +46,8 @@ namespace Centro_Empleado
             dgvAfiliados.CellDoubleClick += dgvAfiliados_CellDoubleClick;
             btnRecetaExtraordinaria.Click += btnRecetaExtraordinaria_Click;
             btnHistorialExtraordinarias.Click += btnHistorialExtraordinarias_Click;
+            btnCambiarContrasena.Click += btnCambiarContrasena_Click;
+            btnRespaldo.Click += btnRespaldo_Click;
             dgvAfiliados.SelectionChanged += dgvAfiliados_SelectionChanged;
             txtBuscar.TextChanged += txtBuscar_TextChanged;
             dgvAfiliados.DataBindingComplete += dgvAfiliados_DataBindingComplete;
@@ -579,17 +583,24 @@ namespace Centro_Empleado
                         MessageBoxButtons.YesNo, 
                         MessageBoxIcon.Question);
                     
-                    if (resultado == DialogResult.Yes)
-                    {
-                        // Mostrar formulario de receta extraordinaria
-                        using (var frmExtraordinaria = new frmRecetaExtraordinaria(afiliado.ApellidoNombre))
-                        {
-                            if (frmExtraordinaria.ShowDialog() == DialogResult.OK && frmExtraordinaria.Aprobado)
-                            {
-                                ImprimirRecetaExtraordinaria(afiliado, frmExtraordinaria.Motivo);
-                            }
-                        }
-                    }
+                     if (resultado == DialogResult.Yes)
+                     {
+                         // Pedir contraseña antes de continuar
+                         using (var frmContrasena = new frmIngresarContrasena())
+                         {
+                             if (frmContrasena.ShowDialog() == DialogResult.OK && frmContrasena.ContrasenaCorrecta)
+                             {
+                                 // Mostrar formulario de receta extraordinaria
+                                 using (var frmExtraordinaria = new frmRecetaExtraordinaria(afiliado.ApellidoNombre))
+                                 {
+                                     if (frmExtraordinaria.ShowDialog() == DialogResult.OK && frmExtraordinaria.Aprobado)
+                                     {
+                                         ImprimirRecetaExtraordinaria(afiliado, frmExtraordinaria.Motivo);
+                                     }
+                                 }
+                             }
+                         }
+                     }
                 }
                 return;
             }
@@ -600,36 +611,35 @@ namespace Centro_Empleado
                 if (frmSeleccion.ShowDialog() == DialogResult.OK)
                 {
                     int recetariosAImprimir = frmSeleccion.CantidadSeleccionada;
-                    bool imprimirDosPorHoja = frmSeleccion.ImprimirDosPorHoja;
                     
-                    try
-                    {
-                        // Generar todos los recetarios necesarios
-                        var recetariosGenerados = new List<Models.Recetario>();
-                        
+                try
+                {
+                    // Generar todos los recetarios necesarios
+                    var recetariosGenerados = new List<Models.Recetario>();
+                    
                         // Obtener números consecutivos para la impresión
                         var numerosAdicionales = dbManager.ObtenerNumerosAdicionales(recetariosAImprimir);
-                        
-                        for (int i = 0; i < recetariosAImprimir; i++)
+                    
+                    for (int i = 0; i < recetariosAImprimir; i++)
+                    {
+                        var recetario = new Models.Recetario
                         {
-                            var recetario = new Models.Recetario
-                            {
                                 NumeroTalonario = numerosAdicionales[i],
-                                IdAfiliado = afiliado.Id,
-                                FechaEmision = DateTime.Now,
-                                FechaVencimiento = DateTime.Now.AddMonths(1)
-                            };
-                            
-                            dbManager.InsertarRecetario(recetario);
+                            IdAfiliado = afiliado.Id,
+                            FechaEmision = DateTime.Now,
+                            FechaVencimiento = DateTime.Now.AddMonths(1)
+                        };
+                        
+                        dbManager.InsertarRecetario(recetario);
                             
                             // Registrar el recetario impreso en el sistema mensual
                             dbManager.RegistrarRecetarioImpreso(afiliado.Id, numerosAdicionales[i]);
                             
-                            recetariosGenerados.Add(recetario);
-                        }
+                        recetariosGenerados.Add(recetario);
+                    }
 
-                        // Generar HTML con todas las recetas
-                        var recetarioManager = new RecetarioManager();
+                    // Generar HTML con todas las recetas
+                    var recetarioManager = new RecetarioManager();
                         
                         // Caso especial: si se seleccionaron 3 recetarios, imprimir 2 primero y luego 1
                         if (recetariosAImprimir == 3)
@@ -646,16 +656,17 @@ namespace Centro_Empleado
                         }
                         else
                         {
-                            // Caso normal: usar la configuración seleccionada
+                            // Caso normal: determinar automáticamente el formato según la cantidad
+                            bool imprimirDosPorHoja = recetariosAImprimir >= 2;
                             recetarioManager.GenerarHTMLConRecetas(recetariosGenerados, afiliado, imprimirDosPorHoja);
                             MessageBox.Show(string.Format("Se generaron {0} recetarios correctamente.", recetariosAImprimir), "Impresión exitosa", MessageBoxButtons.OK, MessageBoxIcon.Information);
                         }
-                        
-                        // Recargar la lista de afiliados para mostrar la información actualizada
-                        CargarAfiliados();
-                    }
-                    catch (Exception ex)
-                    {
+                    
+                    // Recargar la lista de afiliados para mostrar la información actualizada
+                    CargarAfiliados();
+                }
+                catch (Exception ex)
+                {
                         MessageBox.Show(string.Format("Error al generar los recetarios: {0}", ex.Message), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
                     }
                 }
@@ -734,12 +745,19 @@ namespace Centro_Empleado
                 return;
             }
 
-            // Mostrar formulario de receta extraordinaria
-            using (var frmExtraordinaria = new frmRecetaExtraordinaria(afiliado.ApellidoNombre))
+            // Pedir contraseña antes de continuar
+            using (var frmContrasena = new frmIngresarContrasena())
             {
-                if (frmExtraordinaria.ShowDialog() == DialogResult.OK && frmExtraordinaria.Aprobado)
+                if (frmContrasena.ShowDialog() == DialogResult.OK && frmContrasena.ContrasenaCorrecta)
                 {
-                    ImprimirRecetaExtraordinaria(afiliado, frmExtraordinaria.Motivo);
+                    // Mostrar formulario de receta extraordinaria
+                    using (var frmExtraordinaria = new frmRecetaExtraordinaria(afiliado.ApellidoNombre))
+                    {
+                        if (frmExtraordinaria.ShowDialog() == DialogResult.OK && frmExtraordinaria.Aprobado)
+                        {
+                            ImprimirRecetaExtraordinaria(afiliado, frmExtraordinaria.Motivo);
+                        }
+                    }
                 }
             }
         }
@@ -762,5 +780,86 @@ namespace Centro_Empleado
                 frmHistorial.ShowDialog();
             }
         }
+
+        private void btnCambiarContrasena_Click(object sender, EventArgs e)
+        {
+            using (var frmCambiar = new frmCambiarContrasena())
+            {
+                frmCambiar.ShowDialog();
+            }
+        }
+
+        private void btnRespaldo_Click(object sender, EventArgs e)
+        {
+            CrearRespaldoManual();
+        }
+
+        private void CrearRespaldoManual()
+        {
+            try
+            {
+                // Verificar que existe la base de datos
+                string sourceFile = Path.Combine(Application.StartupPath, "CentroEmpleado.db");
+                if (!File.Exists(sourceFile))
+                {
+                    MessageBox.Show("No se encontró la base de datos para respaldar.\n\n" +
+                        "Asegúrese de que el sistema esté funcionando correctamente.", 
+                        "Error", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    return;
+                }
+
+                // Crear carpeta de respaldos si no existe
+                string backupDir = Path.Combine(Application.StartupPath, "Backups");
+                if (!Directory.Exists(backupDir))
+                {
+                    Directory.CreateDirectory(backupDir);
+                }
+
+                // Generar nombre de archivo con timestamp
+                string timestamp = DateTime.Now.ToString("yyyy-MM-dd_HH-mm-ss");
+                string backupFile = Path.Combine(backupDir, $"CentroEmpleado_{timestamp}.db");
+
+                // Mostrar mensaje de confirmación
+                var result = MessageBox.Show(
+                    "¿Desea crear un respaldo de la base de datos?\n\n" +
+                    "Esto puede tomar unos segundos dependiendo del tamaño de los datos.\n\n" +
+                    "El respaldo se guardará en la carpeta 'Backups'.",
+                    "Crear Respaldo",
+                    MessageBoxButtons.YesNo,
+                    MessageBoxIcon.Question);
+
+                if (result != DialogResult.Yes)
+                {
+                    return;
+                }
+
+                // Crear el respaldo
+                File.Copy(sourceFile, backupFile, true);
+
+                // Obtener información del archivo
+                FileInfo fileInfo = new FileInfo(backupFile);
+                string sizeText = fileInfo.Length > 1024 * 1024 ? 
+                    $"{fileInfo.Length / (1024 * 1024):F2} MB" : 
+                    $"{fileInfo.Length / 1024:F2} KB";
+
+                // Contar respaldos existentes
+                string[] existingBackups = Directory.GetFiles(backupDir, "CentroEmpleado_*.db");
+                int totalBackups = existingBackups.Length;
+
+                MessageBox.Show($"✅ Respaldo creado exitosamente:\n\n" +
+                    $"📁 Archivo: {Path.GetFileName(backupFile)}\n" +
+                    $"📊 Tamaño: {sizeText}\n" +
+                    $"📂 Ubicación: {backupDir}\n" +
+                    $"🔢 Total de respaldos: {totalBackups}", 
+                    "Respaldo Completado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"❌ Error al crear el respaldo:\n\n{ex.Message}\n\n" +
+                    "Verifique que tenga permisos de escritura en la carpeta de la aplicación.", 
+                    "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
     }
 }
