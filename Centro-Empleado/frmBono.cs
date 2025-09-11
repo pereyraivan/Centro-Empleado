@@ -105,15 +105,15 @@ namespace Centro_Empleado
 
             if (string.IsNullOrWhiteSpace(txtMonto.Text))
             {
-                MessageBox.Show("Debe ingresar un monto para el bono.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("Debe ingresar un monto para el bono (0 para sin cargo).", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtMonto.Focus();
                 return;
             }
 
             decimal monto;
-            if (!decimal.TryParse(txtMonto.Text, out monto) || monto <= 0)
+            if (!decimal.TryParse(txtMonto.Text, out monto) || monto < 0)
             {
-                MessageBox.Show("El monto debe ser un número válido mayor a 0.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                MessageBox.Show("El monto debe ser un número válido mayor o igual a 0 (0 = sin cargo).", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
                 txtMonto.Focus();
                 return;
             }
@@ -138,8 +138,11 @@ namespace Centro_Empleado
                 // Generar e imprimir el bono
                 GenerarEImprimirBono(bono, afiliadoSeleccionado);
 
-                MessageBox.Show(string.Format("Bono {0} generado correctamente por ${1:F2}", bono.NumeroBono, monto), 
-                    "Bono generado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                string mensajeConfirmacion = monto == 0 
+                    ? string.Format("Bono {0} generado correctamente - SIN CARGO", bono.NumeroBono)
+                    : string.Format("Bono {0} generado correctamente por ${1:F2}", bono.NumeroBono, monto);
+                
+                MessageBox.Show(mensajeConfirmacion, "Bono generado", MessageBoxButtons.OK, MessageBoxIcon.Information);
 
                 // Limpiar formulario para el siguiente bono
                 LimpiarFormulario();

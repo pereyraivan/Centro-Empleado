@@ -323,7 +323,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_13A610AC06384B44B09641D1BFD0F547"
             {
-            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Debug\\recetaFinal.html"
+            "SourcePath" = "8:..\\Centro-Empleado\\Resources\\recetaFinal.html"
             "TargetName" = "8:recetaFinal.html"
             "Tag" = "8:"
             "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"
@@ -374,7 +374,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_207F75DBC7FB431BB8E9485273129B93"
             {
-            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Debug\\bonoFinal.html"
+            "SourcePath" = "8:..\\Centro-Empleado\\Resources\\bonoFinal.html"
             "TargetName" = "8:bonoFinal.html"
             "Tag" = "8:"
             "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"
@@ -538,7 +538,7 @@
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_AA4C1069C9AB42C3ACD7ABB978B776BF"
             {
-            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Debug\\Manual_Usuario.html"
+            "SourcePath" = "8:..\\Centro-Empleado\\Manual_Usuario.html"
             "TargetName" = "8:Manual_Usuario.html"
             "Tag" = "8:"
             "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"
@@ -612,7 +612,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
@@ -632,7 +632,7 @@
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
-            "Exclude" = "11:FALSE"
+            "Exclude" = "11:TRUE"
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
@@ -714,15 +714,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Centro-Empleados-Setup"
-        "ProductCode" = "8:{38B44474-2553-44E3-A47E-C37590DDCDFD}"
-        "PackageCode" = "8:{7EB80B96-436D-4448-99C7-CDD69193825F}"
+        "ProductCode" = "8:{780E931A-D635-4F68-9B74-95D41746D70C}"
+        "PackageCode" = "8:{D34231D4-7092-48A7-AB42-BD25C99CC2D8}"
         "UpgradeCode" = "8:{29E0046E-638D-4146-B48C-7F3BA07BCD99}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
-        "RemovePreviousVersions" = "11:FALSE"
+        "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.0.6"
+        "ProductVersion" = "8:1.1.0"
         "Manufacturer" = "8:pereyraivan@hotmail.com"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"

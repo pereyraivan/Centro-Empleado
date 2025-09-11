@@ -1,0 +1,63 @@
+========================================
+    INSTRUCCIONES DE ACTUALIZACION
+    Sistema Centro de Empleados v2.0
+========================================
+
+PROCESO DE ACTUALIZACION (CONFIRMADO):
+
+1. DESINSTALAR VERSION ANTERIOR
+   - Abrir "Programas y caracteristicas" desde el Panel de control
+   - Buscar "Centro-Empleados-Setup"
+   - Hacer clic derecho y seleccionar "Desinstalar"
+   - Confirmar la desinstalacion
+   - Esperar a que se complete el proceso
+
+2. INSTALAR NUEVA VERSION
+   - Ejecutar el archivo .msi de la nueva version
+   - Seguir las instrucciones del instalador
+   - Confirmar la instalacion
+   - Esperar a que se complete el proceso
+
+3. VERIFICAR INSTALACION
+   - Abrir el sistema actualizado
+   - Verificar que todos los datos estan presentes
+   - Verificar que los nuevos botones estan disponibles
+   - Verificar que las nuevas funcionalidades funcionan
+
+VENTAJAS DE ESTE PROCESO:
+- ✅ Actualizacion completa y limpia
+- ✅ Todos los cambios se aplican correctamente
+- ✅ No hay conflictos entre versiones
+- ✅ Proceso simple y confiable
+
+RESPALDO DE SEGURIDAD (RECOMENDADO):
+- Antes de desinstalar, crear un respaldo de la base de datos
+- Usar el boton "💾 Crear Respaldo" en el panel de operaciones
+- Los respaldos se guardan en la carpeta "Backups"
+
+NUEVAS FUNCIONALIDADES EN ESTA VERSION:
+- Sistema de contraseñas para recetas extraordinarias
+- Respaldo manual de base de datos
+- Mejoras en la interfaz de usuario
+- Validaciones adicionales
+- Sistema de 3 recetas mensuales + 1 extraordinaria
+
+EN CASO DE PROBLEMAS:
+- Si faltan datos: Buscar en la carpeta "Backups" y restaurar
+- Si la aplicacion no abre: Verificar que se instalo correctamente
+- Si hay errores: Contactar al soporte tecnico
+
+ARCHIVOS IMPORTANTES:
+- CentroEmpleado.db: Base de datos principal (se preserva)
+- Backups/: Carpeta con respaldos manuales
+- config.txt: Configuracion del sistema (se preserva)
+
+SOPORTE TECNICO:
+- Email: soporte@centroempleados.com
+- Teléfono: (011) 1234-5678
+- Horario: Lunes a Viernes 9:00 a 18:00
+
+========================================
+    ¡Sistema actualizado exitosamente!
+========================================
+

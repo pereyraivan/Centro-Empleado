@@ -25,6 +25,11 @@ namespace Centro_Empleado
             btnConsultar.Click += btnConsultar_Click;
             btnExportar.Click += btnExportar_Click;
             btnLimpiar.Click += btnLimpiar_Click;
+            btnAnular.Click += btnAnular_Click;
+            
+            // Configurar eventos de la grilla
+            dgvBonos.SelectionChanged += dgvBonos_SelectionChanged;
+            dgvBonos.CellFormatting += dgvBonos_CellFormatting;
             
             // Configurar grillas
             ConfigurarGrillaBonos();
@@ -70,13 +75,31 @@ namespace Centro_Empleado
                 HeaderText = "Concepto",
                 Width = 200
             });
-            dgvBonos.Columns.Add(new DataGridViewTextBoxColumn
+            var columnaMonto = new DataGridViewTextBoxColumn
             {
                 DataPropertyName = "Monto",
                 HeaderText = "Monto",
-                Width = 100,
-                DefaultCellStyle = new DataGridViewCellStyle { Format = "C2" }
-            });
+                Width = 100
+            };
+            
+            // Configurar formato personalizado para mostrar S.N cuando el monto es cero
+            columnaMonto.DefaultCellStyle.Format = "C2";
+            columnaMonto.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
+            dgvBonos.Columns.Add(columnaMonto);
+            
+            // Columna de acciones con botón de anular
+            var columnaAcciones = new DataGridViewButtonColumn
+            {
+                HeaderText = "Acciones",
+                Text = "Anular",
+                UseColumnTextForButtonValue = true,
+                Width = 80,
+                FlatStyle = FlatStyle.Standard
+            };
+            dgvBonos.Columns.Add(columnaAcciones);
+            
+            // Configurar evento para el clic en botones de la grilla
+            dgvBonos.CellContentClick += dgvBonos_CellContentClick;
         }
 
         private void ConfigurarGrillaResumen()
@@ -212,9 +235,15 @@ namespace Centro_Empleado
                 decimal totalMonto = 0;
                 foreach (dynamic bono in bonos)
                 {
-                    writer.WriteLine(string.Format("{0};{1:dd/MM/yyyy};{2};{3};{4};{5:F2}", 
-                        bono.NumeroBono, bono.FechaEmision, bono.ApellidoNombre, bono.DNI, bono.Concepto, bono.Monto));
-                    totalMonto += bono.Monto;
+                    string montoTexto = bono.Monto == 0 ? "S.N" : string.Format("{0:F2}", bono.Monto);
+                    writer.WriteLine(string.Format("{0};{1:dd/MM/yyyy};{2};{3};{4};{5}", 
+                        bono.NumeroBono, bono.FechaEmision, bono.ApellidoNombre, bono.DNI, bono.Concepto, montoTexto));
+                    
+                    // Solo sumar al total si el monto no es cero
+                    if (bono.Monto > 0)
+                    {
+                        totalMonto += bono.Monto;
+                    }
                 }
                 
                 // Fila de total
@@ -231,6 +260,114 @@ namespace Centro_Empleado
             dgvResumen.DataSource = null;
             lblTotalGeneral.Text = "Total General: $0.00";
             lblCantidadBonos.Text = "Cantidad de Bonos: 0";
+            btnAnular.Enabled = false;
+        }
+        
+        private void dgvBonos_SelectionChanged(object sender, EventArgs e)
+        {
+            // Habilitar/deshabilitar botón de anular según si hay una fila seleccionada
+            btnAnular.Enabled = dgvBonos.SelectedRows.Count > 0;
+        }
+        
+        private void dgvBonos_CellFormatting(object sender, DataGridViewCellFormattingEventArgs e)
+        {
+            // Formatear la columna de monto para mostrar S.N cuando es cero
+            if (dgvBonos.Columns[e.ColumnIndex].DataPropertyName == "Monto")
+            {
+                if (e.Value != null && decimal.TryParse(e.Value.ToString(), out decimal monto))
+                {
+                    if (monto == 0)
+                    {
+                        e.Value = "S.N";
+                        e.FormattingApplied = true;
+                    }
+                }
+            }
+        }
+        
+        private void dgvBonos_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
+            // Verificar si se hizo clic en la columna de acciones (última columna)
+            if (e.ColumnIndex == dgvBonos.Columns.Count - 1 && e.RowIndex >= 0)
+            {
+                // Obtener el bono de la fila seleccionada
+                var bonoSeleccionado = dgvBonos.Rows[e.RowIndex].DataBoundItem as dynamic;
+                if (bonoSeleccionado != null)
+                {
+                    AnularBonoSeleccionado(bonoSeleccionado);
+                }
+            }
+        }
+        
+        private void btnAnular_Click(object sender, EventArgs e)
+        {
+            if (dgvBonos.SelectedRows.Count == 0)
+            {
+                MessageBox.Show("Debe seleccionar un bono para anular.", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                return;
+            }
+            
+            var bonoSeleccionado = dgvBonos.SelectedRows[0].DataBoundItem as dynamic;
+            if (bonoSeleccionado == null)
+            {
+                MessageBox.Show("No se pudo obtener la información del bono seleccionado.", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                return;
+            }
+            
+            AnularBonoSeleccionado(bonoSeleccionado);
+        }
+        
+        private void AnularBonoSeleccionado(dynamic bonoSeleccionado)
+        {
+            try
+            {
+                // Mostrar confirmación con detalles del bono
+                string montoTexto = bonoSeleccionado.Monto == 0 ? "SIN CARGO" : string.Format("${0:F2}", bonoSeleccionado.Monto);
+                string mensaje = string.Format(
+                    "¿Está seguro que desea anular el siguiente bono?\n\n" +
+                    "N° Bono: {0}\n" +
+                    "Fecha: {1:dd/MM/yyyy}\n" +
+                    "Afiliado: {2}\n" +
+                    "DNI: {3}\n" +
+                    "Concepto: {4}\n" +
+                    "Monto: {5}\n\n" +
+                    "Esta acción no se puede deshacer.",
+                    bonoSeleccionado.NumeroBono,
+                    bonoSeleccionado.FechaEmision,
+                    bonoSeleccionado.ApellidoNombre,
+                    bonoSeleccionado.DNI,
+                    bonoSeleccionado.Concepto,
+                    montoTexto
+                );
+                
+                DialogResult resultado = MessageBox.Show(mensaje, "Confirmar Anulación de Bono", 
+                    MessageBoxButtons.YesNo, MessageBoxIcon.Question, MessageBoxDefaultButton.Button2);
+                
+                if (resultado == DialogResult.Yes)
+                {
+                    // Anular el bono
+                    bool anulado = dbManager.AnularBono(bonoSeleccionado.Id);
+                    
+                    if (anulado)
+                    {
+                        MessageBox.Show(string.Format("Bono {0} anulado correctamente.", bonoSeleccionado.NumeroBono), 
+                            "Bono Anulado", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                        
+                        // Recargar datos para actualizar totales
+                        CargarDatos();
+                    }
+                    else
+                    {
+                        MessageBox.Show("No se pudo anular el bono. Verifique que el bono existe.", "Error", 
+                            MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show(string.Format("Error al anular bono: {0}", ex.Message), "Error", 
+                    MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
         }
     }
 }

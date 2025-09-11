@@ -25,18 +25,18 @@ namespace Centro_Empleado
                     {
                         if (linea.StartsWith("CONTRASENA="))
                         {
-                            lblContrasenaActual.Text = "Contraseña actual: " + linea.Substring(11);
+                           
                             return;
                         }
                     }
                 }
-                lblContrasenaActual.Text = "Contraseña actual: admin123 (por defecto)";
+                
             }
             catch (Exception ex)
             {
                 MessageBox.Show("Error al cargar la configuración: " + ex.Message, "Error", 
                     MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                lblContrasenaActual.Text = "Contraseña actual: admin123 (por defecto)";
+              
             }
         }
 

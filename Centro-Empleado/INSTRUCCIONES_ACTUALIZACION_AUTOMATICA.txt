@@ -1,0 +1,75 @@
+========================================
+    ACTUALIZACION AUTOMATICA SIN PERDIDA DE DATOS
+    Sistema Centro de Empleados v2.0
+========================================
+
+CONFIGURACION IMPLEMENTADA:
+- ✅ RemovePreviousVersions = TRUE (Actualiza automaticamente)
+- ✅ DetectNewerInstalledVersion = TRUE (Detecta versiones existentes)
+- ✅ Base de datos EXCLUIDA del instalador (Se preserva)
+- ✅ Archivo de configuracion EXCLUIDO del instalador (Se preserva)
+- ✅ Ejecutable INCLUIDO en el instalador (Se actualiza)
+
+PROCESO DE ACTUALIZACION (SIN PERDIDA DE DATOS):
+
+1. INSTALAR NUEVA VERSION
+   - Ejecutar el archivo .msi de la nueva version
+   - El instalador detectara la version anterior automaticamente
+   - Se mostrara un mensaje de "Actualizacion" (NO desinstalacion)
+   - Confirmar la actualizacion
+   - La version anterior se actualizara automaticamente
+
+2. VERIFICAR ACTUALIZACION
+   - Abrir el sistema actualizado
+   - Verificar que todos los datos estan presentes
+   - Verificar que los nuevos botones estan disponibles
+   - Verificar que las nuevas funcionalidades funcionan
+
+VENTAJAS DE ESTA CONFIGURACION:
+- ✅ Actualizacion automatica sin desinstalar
+- ✅ Base de datos se preserva completamente
+- ✅ Configuracion se mantiene intacta
+- ✅ Solo se actualizan archivos necesarios
+- ✅ Proceso mas rapido y seguro
+
+ARCHIVOS QUE SE PRESERVAN:
+- CentroEmpleado.db: Base de datos principal (NO se toca)
+- config.txt: Configuracion del sistema (NO se toca)
+- Backups/: Carpeta con respaldos (NO se toca)
+
+ARCHIVOS QUE SE ACTUALIZAN:
+- Centro-Empleado.exe: Ejecutable principal
+- Archivos HTML: recetaFinal.html, bonoFinal.html
+- DLLs: SQLite.Interop.dll, System.Data.SQLite.dll
+- Manual: Manual_Usuario.html
+
+VERIFICACION DE CONFIGURACION:
+Ejecutar el script: verificar_configuracion_actualizacion.bat
+Este script verificara que la configuracion sea correcta.
+
+EN CASO DE PROBLEMAS:
+1. Verificar que la configuracion sea correcta
+2. Verificar que no hay errores de compilacion
+3. Verificar que todos los archivos estan presentes
+4. Contactar al soporte tecnico si es necesario
+
+RESPALDO DE SEGURIDAD (RECOMENDADO):
+- Aunque no es necesario, se recomienda crear un respaldo
+- Usar el boton "💾 Crear Respaldo" en el panel de operaciones
+- Los respaldos se guardan en la carpeta "Backups"
+
+NUEVAS FUNCIONALIDADES EN ESTA VERSION:
+- Sistema de contraseñas para recetas extraordinarias
+- Respaldo manual de base de datos
+- Mejoras en la interfaz de usuario
+- Validaciones adicionales
+- Sistema de 3 recetas mensuales + 1 extraordinaria
+
+SOPORTE TECNICO:
+- Email: soporte@centroempleados.com
+- Teléfono: (011) 1234-5678
+- Horario: Lunes a Viernes 9:00 a 18:00
+
+========================================
+    ¡Actualizacion automatica configurada!
+========================================

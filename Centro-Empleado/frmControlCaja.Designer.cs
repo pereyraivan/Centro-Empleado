@@ -37,6 +37,7 @@ namespace Centro_Empleado
             this.lblFechaHasta = new System.Windows.Forms.Label();
             this.lblFechaDesde = new System.Windows.Forms.Label();
             this.groupBox2 = new System.Windows.Forms.GroupBox();
+            this.btnAnular = new System.Windows.Forms.Button();
             this.lblCantidadBonos = new System.Windows.Forms.Label();
             this.lblTotalGeneral = new System.Windows.Forms.Label();
             this.dgvBonos = new System.Windows.Forms.DataGridView();
@@ -128,6 +129,7 @@ namespace Centro_Empleado
             // 
             // groupBox2
             // 
+            this.groupBox2.Controls.Add(this.btnAnular);
             this.groupBox2.Controls.Add(this.lblCantidadBonos);
             this.groupBox2.Controls.Add(this.lblTotalGeneral);
             this.groupBox2.Controls.Add(this.dgvBonos);
@@ -137,6 +139,16 @@ namespace Centro_Empleado
             this.groupBox2.TabIndex = 1;
             this.groupBox2.TabStop = false;
             this.groupBox2.Text = "Bonos Detallados";
+            // 
+            // btnAnular
+            // 
+            this.btnAnular.Enabled = false;
+            this.btnAnular.Location = new System.Drawing.Point(150, 20);
+            this.btnAnular.Name = "btnAnular";
+            this.btnAnular.Size = new System.Drawing.Size(75, 25);
+            this.btnAnular.TabIndex = 3;
+            this.btnAnular.Text = "Anular Bono";
+            this.btnAnular.UseVisualStyleBackColor = true;
             // 
             // lblCantidadBonos
             // 
@@ -242,6 +254,7 @@ namespace Centro_Empleado
         private System.Windows.Forms.Label lblFechaHasta;
         private System.Windows.Forms.Label lblFechaDesde;
         private System.Windows.Forms.GroupBox groupBox2;
+        private System.Windows.Forms.Button btnAnular;
         private System.Windows.Forms.Label lblCantidadBonos;
         private System.Windows.Forms.Label lblTotalGeneral;
         private System.Windows.Forms.DataGridView dgvBonos;

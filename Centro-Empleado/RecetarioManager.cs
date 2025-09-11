@@ -30,7 +30,7 @@ namespace Centro_Empleado
         {
             try
             {
-                string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Resources", "recetaFinal.html");
+                string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "recetaFinal.html");
                 if (!File.Exists(templatePath))
                 {
                     throw new FileNotFoundException("No se encontró la plantilla HTML de receta.");

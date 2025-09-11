@@ -1193,10 +1193,10 @@ namespace Centro_Empleado.Data
             return bonos;
         }
         
-        // Obtener total de caja por rango de fechas
+        // Obtener total de caja por rango de fechas (excluyendo bonos sin cargo)
         public decimal ObtenerTotalCajaPorRangoFechas(DateTime fechaDesde, DateTime fechaHasta)
         {
-            string sql = "SELECT COALESCE(SUM(Monto), 0) FROM Bono WHERE FechaEmision BETWEEN @FechaDesde AND @FechaHasta";
+            string sql = "SELECT COALESCE(SUM(Monto), 0) FROM Bono WHERE FechaEmision BETWEEN @FechaDesde AND @FechaHasta AND Monto > 0";
             
             using (var connection = new SQLiteConnection(connectionString))
             {
@@ -1211,14 +1211,14 @@ namespace Centro_Empleado.Data
             }
         }
         
-        // Obtener resumen de caja por día
+        // Obtener resumen de caja por día (excluyendo bonos sin cargo del total)
         public List<dynamic> ObtenerResumenCajaPorDia(DateTime fechaDesde, DateTime fechaHasta)
         {
             var resumen = new List<dynamic>();
             string sql = @"SELECT 
                             DATE(b.FechaEmision) as Fecha,
                             COUNT(*) as CantidadBonos,
-                            SUM(b.Monto) as TotalDia
+                            SUM(CASE WHEN b.Monto > 0 THEN b.Monto ELSE 0 END) as TotalDia
                           FROM Bono b 
                           WHERE b.FechaEmision BETWEEN @FechaDesde AND @FechaHasta 
                           GROUP BY DATE(b.FechaEmision)
@@ -1246,6 +1246,66 @@ namespace Centro_Empleado.Data
                 }
             }
             return resumen;
+        }
+        
+        // Anular un bono (eliminar de la base de datos)
+        public bool AnularBono(int idBono)
+        {
+            try
+            {
+                string sql = "DELETE FROM Bono WHERE Id = @Id";
+                
+                using (var connection = new SQLiteConnection(connectionString))
+                {
+                    connection.Open();
+                    using (var command = new SQLiteCommand(sql, connection))
+                    {
+                        command.Parameters.AddWithValue("@Id", idBono);
+                        int filasAfectadas = command.ExecuteNonQuery();
+                        return filasAfectadas > 0;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(string.Format("Error al anular bono: {0}", ex.Message));
+            }
+        }
+        
+        // Obtener información de un bono por ID
+        public dynamic ObtenerBonoPorId(int idBono)
+        {
+            string sql = @"SELECT b.*, a.ApellidoNombre, a.DNI, a.Empresa 
+                          FROM Bono b 
+                          INNER JOIN Afiliado a ON b.IdAfiliado = a.Id 
+                          WHERE b.Id = @Id";
+            
+            using (var connection = new SQLiteConnection(connectionString))
+            {
+                connection.Open();
+                using (var command = new SQLiteCommand(sql, connection))
+                {
+                    command.Parameters.AddWithValue("@Id", idBono);
+                    using (var reader = command.ExecuteReader())
+                    {
+                        if (reader.Read())
+                        {
+                            return new
+                            {
+                                Id = Convert.ToInt32(reader["Id"]),
+                                NumeroBono = reader["NumeroBono"].ToString(),
+                                FechaEmision = Convert.ToDateTime(reader["FechaEmision"]),
+                                Monto = Convert.ToDecimal(reader["Monto"]),
+                                Concepto = reader["Concepto"].ToString(),
+                                ApellidoNombre = reader["ApellidoNombre"].ToString(),
+                                DNI = reader["DNI"].ToString(),
+                                Empresa = reader["Empresa"].ToString()
+                            };
+                        }
+                    }
+                }
+            }
+            return null;
         }
 
         // Actualizar datos de un afiliado

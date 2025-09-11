@@ -1,0 +1,76 @@
+========================================
+    INSTRUCCIONES DE ACTUALIZACION
+    Sistema Centro de Empleados v2.0
+========================================
+
+IMPORTANTE: Esta versión del instalador está configurada
+para ACTUALIZAR automáticamente la versión anterior,
+eliminando instalaciones duplicadas.
+
+PASOS PARA ACTUALIZAR:
+
+1. CREAR RESPALDO DE SEGURIDAD (RECOMENDADO)
+   - Abrir el sistema actual
+   - Hacer clic en "💾 Crear Respaldo" en el panel de operaciones
+   - Confirmar la creación del respaldo
+   - Esperar a que se complete el proceso
+
+2. CERRAR LA APLICACIÓN
+   - Cerrar completamente el sistema Centro de Empleados
+   - Verificar que no esté ejecutándose en segundo plano
+
+3. INSTALAR LA NUEVA VERSIÓN
+   - Ejecutar el archivo .msi de la nueva versión
+   - El instalador detectará la versión anterior
+   - Se mostrará un mensaje de "Actualización"
+   - Confirmar la actualización
+   - La versión anterior se eliminará automáticamente
+
+4. VERIFICAR LA INSTALACIÓN
+   - Abrir el sistema actualizado
+   - Verificar que todos los datos están presentes
+   - Solo debe aparecer UNA entrada en "Programas y características"
+
+VENTAJAS DE ESTA VERSIÓN:
+- ✅ Actualización automática (no duplicados)
+- ✅ Preservación de datos existentes
+- ✅ Eliminación automática de versiones anteriores
+- ✅ Proceso más limpio y profesional
+
+RESPALDO MANUAL:
+- Los respaldos se crean solo cuando el usuario lo solicita
+- Los respaldos se guardan en la carpeta "Backups"
+- Se recomienda crear respaldo antes de actualizaciones importantes
+
+EN CASO DE PROBLEMAS:
+
+Si después de la actualización faltan datos:
+1. Buscar en la carpeta "Backups" el archivo más reciente
+2. Ejecutar "restaurar_respaldo.bat"
+3. Contactar al soporte técnico si es necesario
+
+Si aparecen múltiples entradas en "Programas y características":
+1. Desinstalar todas las versiones desde "Programas y características"
+2. Reinstalar la versión más reciente
+3. Contactar al soporte técnico
+
+ARCHIVOS IMPORTANTES:
+- CentroEmpleado.db: Base de datos principal (se preserva)
+- Backups/: Carpeta con respaldos manuales
+- config.txt: Configuración del sistema (se preserva)
+
+NUEVAS FUNCIONALIDADES EN ESTA VERSIÓN:
+- Sistema de contraseñas para recetas extraordinarias
+- Respaldo manual de base de datos
+- Actualización automática sin duplicados
+- Mejoras en la interfaz de usuario
+- Validaciones adicionales
+
+SOPORTE TÉCNICO:
+- Email: soporte@centroempleados.com
+- Teléfono: (011) 1234-5678
+- Horario: Lunes a Viernes 9:00 a 18:00
+
+========================================
+    ¡Gracias por usar nuestro sistema!
+========================================
