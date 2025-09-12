@@ -87,19 +87,6 @@ namespace Centro_Empleado
             columnaMonto.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight;
             dgvBonos.Columns.Add(columnaMonto);
             
-            // Columna de acciones con botón de anular
-            var columnaAcciones = new DataGridViewButtonColumn
-            {
-                HeaderText = "Acciones",
-                Text = "Anular",
-                UseColumnTextForButtonValue = true,
-                Width = 80,
-                FlatStyle = FlatStyle.Standard
-            };
-            dgvBonos.Columns.Add(columnaAcciones);
-            
-            // Configurar evento para el clic en botones de la grilla
-            dgvBonos.CellContentClick += dgvBonos_CellContentClick;
         }
 
         private void ConfigurarGrillaResumen()
@@ -285,19 +272,6 @@ namespace Centro_Empleado
             }
         }
         
-        private void dgvBonos_CellContentClick(object sender, DataGridViewCellEventArgs e)
-        {
-            // Verificar si se hizo clic en la columna de acciones (última columna)
-            if (e.ColumnIndex == dgvBonos.Columns.Count - 1 && e.RowIndex >= 0)
-            {
-                // Obtener el bono de la fila seleccionada
-                var bonoSeleccionado = dgvBonos.Rows[e.RowIndex].DataBoundItem as dynamic;
-                if (bonoSeleccionado != null)
-                {
-                    AnularBonoSeleccionado(bonoSeleccionado);
-                }
-            }
-        }
         
         private void btnAnular_Click(object sender, EventArgs e)
         {

@@ -25,6 +25,14 @@ namespace Centro_Empleado
             // Configurar fecha actual
             dtpFecha.Value = DateTime.Now;
             
+            // Configurar placeholder para el campo monto
+            txtMonto.Text = "0 (dejar vacío para sin cargo)";
+            txtMonto.ForeColor = System.Drawing.Color.Gray;
+            
+            // Configurar eventos para el placeholder
+            txtMonto.Enter += TxtMonto_Enter;
+            txtMonto.Leave += TxtMonto_Leave;
+            
             // Configurar eventos
             btnBuscar.Click += btnBuscar_Click;
             btnImprimirBono.Click += btnImprimirBono_Click;
@@ -49,6 +57,26 @@ namespace Centro_Empleado
             if (e.KeyChar == '.' && (sender as TextBox).Text.IndexOf('.') > -1)
             {
                 e.Handled = true;
+            }
+        }
+        
+        private void TxtMonto_Enter(object sender, EventArgs e)
+        {
+            // Si el texto es el placeholder, limpiarlo y cambiar color
+            if (txtMonto.Text == "0 (dejar vacío para sin cargo)")
+            {
+                txtMonto.Text = "";
+                txtMonto.ForeColor = System.Drawing.Color.Black;
+            }
+        }
+        
+        private void TxtMonto_Leave(object sender, EventArgs e)
+        {
+            // Si el campo está vacío, mostrar el placeholder
+            if (string.IsNullOrWhiteSpace(txtMonto.Text))
+            {
+                txtMonto.Text = "0 (dejar vacío para sin cargo)";
+                txtMonto.ForeColor = System.Drawing.Color.Gray;
             }
         }
 
@@ -103,19 +131,21 @@ namespace Centro_Empleado
                 return;
             }
 
-            if (string.IsNullOrWhiteSpace(txtMonto.Text))
-            {
-                MessageBox.Show("Debe ingresar un monto para el bono (0 para sin cargo).", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtMonto.Focus();
-                return;
-            }
-
             decimal monto;
-            if (!decimal.TryParse(txtMonto.Text, out monto) || monto < 0)
+            
+            // Si no se ingresa nada o es el placeholder, tomar como sin costo (0)
+            if (string.IsNullOrWhiteSpace(txtMonto.Text) || txtMonto.Text == "0 (dejar vacío para sin cargo)")
             {
-                MessageBox.Show("El monto debe ser un número válido mayor o igual a 0 (0 = sin cargo).", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-                txtMonto.Focus();
-                return;
+                monto = 0;
+            }
+            else
+            {
+                if (!decimal.TryParse(txtMonto.Text, out monto) || monto < 0)
+                {
+                    MessageBox.Show("El monto debe ser un número válido mayor o igual a 0 (0 = sin cargo).", "Validación", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+                    txtMonto.Focus();
+                    return;
+                }
             }
 
             try
@@ -261,7 +291,11 @@ namespace Centro_Empleado
             txtDNI.Clear();
             txtApellidoNombre.Clear();
             txtEmpresa.Clear();
-            txtMonto.Clear();
+            
+            // Restaurar placeholder en el campo monto
+            txtMonto.Text = "0 (dejar vacío para sin cargo)";
+            txtMonto.ForeColor = System.Drawing.Color.Gray;
+            
             txtConcepto.Clear();
             txtObservaciones.Clear();
             dtpFecha.Value = DateTime.Now;
