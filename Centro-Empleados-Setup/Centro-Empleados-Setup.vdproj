@@ -21,14 +21,14 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_0E8DB18B3BD58D097DA2D842A585D674"
-        "OwnerKey" = "8:_900C1C72E2E240FDBEF8FBB792420E96"
+        "MsmKey" = "8:_0955884B37F34D1E88BEE2AA598CDF19"
+        "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_127426CF57FE4115B11D010E567C59A5"
-        "OwnerKey" = "8:_UNDEFINED"
+        "MsmKey" = "8:_0E8DB18B3BD58D097DA2D842A585D674"
+        "OwnerKey" = "8:_900C1C72E2E240FDBEF8FBB792420E96"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
@@ -87,6 +87,12 @@
         }
         "Entry"
         {
+        "MsmKey" = "8:_8FB70BDDDBDA4FBAA192BCC66B4161E1"
+        "OwnerKey" = "8:_UNDEFINED"
+        "MsmSig" = "8:_UNDEFINED"
+        }
+        "Entry"
+        {
         "MsmKey" = "8:_900C1C72E2E240FDBEF8FBB792420E96"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
@@ -117,19 +123,13 @@
         }
         "Entry"
         {
-        "MsmKey" = "8:_ADA66ADB1660460B9CB5D96B14066353"
+        "MsmKey" = "8:_CA0F07A64B3A43428C39D572A27AF41F"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
         "Entry"
         {
-        "MsmKey" = "8:_D18AB8CE150C4ABC856FDE323CA302D0"
-        "OwnerKey" = "8:_UNDEFINED"
-        "MsmSig" = "8:_UNDEFINED"
-        }
-        "Entry"
-        {
-        "MsmKey" = "8:_FB8583EA6AAD4F11910BAA55CABD230B"
+        "MsmKey" = "8:_D84F047D262645648B0250B38F47721E"
         "OwnerKey" = "8:_UNDEFINED"
         "MsmSig" = "8:_UNDEFINED"
         }
@@ -290,6 +290,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_0955884B37F34D1E88BEE2AA598CDF19"
+            {
+            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Release\\x86\\SQLite.Interop.dll"
+            "TargetName" = "8:SQLite.Interop.dll"
+            "Tag" = "8:"
+            "Folder" = "8:_4549C3D2849E461AA3C310591CE967DF"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_0E8DB18B3BD58D097DA2D842A585D674"
             {
             "AssemblyRegister" = "3:1"
@@ -319,26 +339,6 @@
             "Register" = "3:1"
             "Exclude" = "11:FALSE"
             "IsDependency" = "11:TRUE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_127426CF57FE4115B11D010E567C59A5"
-            {
-            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Debug\\CentroEmpleado.db"
-            "TargetName" = "8:CentroEmpleado.db"
-            "Tag" = "8:"
-            "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"
-            "Condition" = "8:"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:FALSE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:TRUE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
             "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_13A610AC06384B44B09641D1BFD0F547"
@@ -525,6 +525,26 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_8FB70BDDDBDA4FBAA192BCC66B4161E1"
+            {
+            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Release\\CentroEmpleado.db"
+            "TargetName" = "8:CentroEmpleado.db"
+            "Tag" = "8:"
+            "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"
+            "Condition" = "8:"
+            "Transitive" = "11:FALSE"
+            "Vital" = "11:TRUE"
+            "ReadOnly" = "11:FALSE"
+            "Hidden" = "11:FALSE"
+            "System" = "11:FALSE"
+            "Permanent" = "11:FALSE"
+            "SharedLegacy" = "11:FALSE"
+            "PackageAs" = "3:1"
+            "Register" = "3:1"
+            "Exclude" = "11:FALSE"
+            "IsDependency" = "11:FALSE"
+            "IsolateTo" = "8:"
+            }
             "{9F6F8455-1EF1-4B85-886A-4223BCC8E7F7}:_A450EA42FD39863BEEFBB74088835037"
             {
             "AssemblyRegister" = "3:1"
@@ -576,39 +596,19 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_ADA66ADB1660460B9CB5D96B14066353"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_CA0F07A64B3A43428C39D572A27AF41F"
             {
-            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Debug\\x86\\SQLite.Interop.dll"
-            "TargetName" = "8:SQLite.Interop.dll"
-            "Tag" = "8:"
-            "Folder" = "8:_4549C3D2849E461AA3C310591CE967DF"
-            "Condition" = "8:NOT Installed"
-            "Transitive" = "11:FALSE"
-            "Vital" = "11:FALSE"
-            "ReadOnly" = "11:FALSE"
-            "Hidden" = "11:FALSE"
-            "System" = "11:FALSE"
-            "Permanent" = "11:TRUE"
-            "SharedLegacy" = "11:FALSE"
-            "PackageAs" = "3:1"
-            "Register" = "3:1"
-            "Exclude" = "11:FALSE"
-            "IsDependency" = "11:FALSE"
-            "IsolateTo" = "8:"
-            }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D18AB8CE150C4ABC856FDE323CA302D0"
-            {
-            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Debug\\x64\\SQLite.Interop.dll"
+            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Release\\x64\\SQLite.Interop.dll"
             "TargetName" = "8:SQLite.Interop.dll"
             "Tag" = "8:"
             "Folder" = "8:_AFB0112D550B414D9EF36D18B4771A0A"
-            "Condition" = "8:NOT Installed"
+            "Condition" = "8:"
             "Transitive" = "11:FALSE"
             "Vital" = "11:TRUE"
             "ReadOnly" = "11:FALSE"
             "Hidden" = "11:FALSE"
             "System" = "11:FALSE"
-            "Permanent" = "11:TRUE"
+            "Permanent" = "11:FALSE"
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
@@ -616,9 +616,9 @@
             "IsDependency" = "11:FALSE"
             "IsolateTo" = "8:"
             }
-            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_FB8583EA6AAD4F11910BAA55CABD230B"
+            "{1FB2D0AE-D3B9-43D4-B9DD-F88EC61E35DE}:_D84F047D262645648B0250B38F47721E"
             {
-            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Debug\\Centro-Empleado.exe.config"
+            "SourcePath" = "8:..\\Centro-Empleado\\bin\\Release\\Centro-Empleado.exe.config"
             "TargetName" = "8:Centro-Empleado.exe.config"
             "Tag" = "8:"
             "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"
@@ -628,7 +628,7 @@
             "ReadOnly" = "11:FALSE"
             "Hidden" = "11:FALSE"
             "System" = "11:FALSE"
-            "Permanent" = "11:TRUE"
+            "Permanent" = "11:FALSE"
             "SharedLegacy" = "11:FALSE"
             "PackageAs" = "3:1"
             "Register" = "3:1"
@@ -714,15 +714,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Centro-Empleados-Setup"
-        "ProductCode" = "8:{780E931A-D635-4F68-9B74-95D41746D70C}"
-        "PackageCode" = "8:{D34231D4-7092-48A7-AB42-BD25C99CC2D8}"
+        "ProductCode" = "8:{DE71F838-C48C-41BD-8651-066607E9D9E2}"
+        "PackageCode" = "8:{BCEF1110-8D0E-40C4-A70A-19C115BACE67}"
         "UpgradeCode" = "8:{29E0046E-638D-4146-B48C-7F3BA07BCD99}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.1.0"
+        "ProductVersion" = "8:1.1.3"
         "Manufacturer" = "8:pereyraivan@hotmail.com"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1264,7 +1264,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_900C1C72E2E240FDBEF8FBB792420E96"
             {
-            "SourcePath" = "8:..\\Centro-Empleado\\obj\\Release\\Centro-Empleado.exe"
+            "SourcePath" = "8:..\\Centro-Empleado\\obj\\Debug\\Centro-Empleado.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"
