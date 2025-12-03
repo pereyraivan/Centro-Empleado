@@ -714,15 +714,15 @@
         {
         "Name" = "8:Microsoft Visual Studio"
         "ProductName" = "8:Centro-Empleados-Setup"
-        "ProductCode" = "8:{780E931A-D635-4F68-9B74-95D41746D70C}"
-        "PackageCode" = "8:{D34231D4-7092-48A7-AB42-BD25C99CC2D8}"
+        "ProductCode" = "8:{C8C3AC63-93C4-4E24-B6FA-1E344B248DC0}"
+        "PackageCode" = "8:{6A534BDA-C832-4217-9524-AB5C2AD18598}"
         "UpgradeCode" = "8:{29E0046E-638D-4146-B48C-7F3BA07BCD99}"
         "AspNetVersion" = "8:4.0.30319.0"
         "RestartWWWService" = "11:FALSE"
         "RemovePreviousVersions" = "11:TRUE"
         "DetectNewerInstalledVersion" = "11:TRUE"
         "InstallAllUsers" = "11:FALSE"
-        "ProductVersion" = "8:1.1.0"
+        "ProductVersion" = "8:1.1.7"
         "Manufacturer" = "8:pereyraivan@hotmail.com"
         "ARPHELPTELEPHONE" = "8:"
         "ARPHELPLINK" = "8:"
@@ -1264,7 +1264,7 @@
         {
             "{5259A561-127C-4D43-A0A1-72F10C7B3BF8}:_900C1C72E2E240FDBEF8FBB792420E96"
             {
-            "SourcePath" = "8:..\\Centro-Empleado\\obj\\Release\\Centro-Empleado.exe"
+            "SourcePath" = "8:..\\Centro-Empleado\\obj\\Debug\\Centro-Empleado.exe"
             "TargetName" = "8:"
             "Tag" = "8:"
             "Folder" = "8:_0C5C8C45E2F442E88026032829AFC9A7"

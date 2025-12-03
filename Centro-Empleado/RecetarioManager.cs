@@ -125,7 +125,7 @@ namespace Centro_Empleado
         {
             // Reemplazar placeholders de la primera receta (sin sufijo)
             html = html.Replace("{{NUMERO_TALONARIO}}", recetario.NumeroTalonario.ToString("D6"));
-            html = html.Replace("{{DNI}}", WebUtility.HtmlEncode(afiliado.DNI ?? ""));
+            html = html.Replace("{{NUMERO_AFILIADO}}", WebUtility.HtmlEncode(afiliado.NumeroAfiliado ?? ""));
             html = html.Replace("{{FECHA_EMISION}}", recetario.FechaEmision.ToString("dd/MM/yyyy"));
             html = html.Replace("{{FECHA_VENCIMIENTO}}", recetario.FechaVencimiento.ToString("dd/MM/yyyy"));
             html = html.Replace("{{APELLIDO_NOMBRE}}", WebUtility.HtmlEncode(afiliado.ApellidoNombre ?? ""));
@@ -138,7 +138,7 @@ namespace Centro_Empleado
         {
             // Reemplazar placeholders de la segunda receta (con sufijo SEGUNDO)
             html = html.Replace("{{NUMERO_TALONARIO_SEGUNDO}}", recetario.NumeroTalonario.ToString("D6"));
-            html = html.Replace("{{DNI_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.DNI ?? ""));
+            html = html.Replace("{{NUMERO_AFILIADO_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.NumeroAfiliado ?? ""));
             html = html.Replace("{{FECHA_EMISION_SEGUNDO}}", recetario.FechaEmision.ToString("dd/MM/yyyy"));
             html = html.Replace("{{FECHA_VENCIMIENTO_SEGUNDO}}", recetario.FechaVencimiento.ToString("dd/MM/yyyy"));
             html = html.Replace("{{APELLIDO_NOMBRE_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.ApellidoNombre ?? ""));
