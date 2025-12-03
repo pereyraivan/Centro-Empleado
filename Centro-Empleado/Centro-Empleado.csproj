@@ -34,7 +34,7 @@
     <BootstrapperEnabled>true</BootstrapperEnabled>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -44,17 +44,11 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <Target Name="PostBuild" AfterTargets="PostBuildEvent">
-    <!-- Copiar la DLL nativa de SQLite según la arquitectura de compilación -->
-    <PropertyGroup>
-      <SQLiteInteropPath Condition="'$(PlatformTarget)' == 'x64'">$(OutputPath)x64\SQLite.Interop.dll</SQLiteInteropPath>
-      <SQLiteInteropPath Condition="'$(PlatformTarget)' == 'x86'">$(OutputPath)x86\SQLite.Interop.dll</SQLiteInteropPath>
-      <SQLiteInteropPath Condition="'$(PlatformTarget)' == 'AnyCPU'">$(OutputPath)x64\SQLite.Interop.dll</SQLiteInteropPath>
-    </PropertyGroup>
-    <Copy SourceFiles="$(SQLiteInteropPath)" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" Condition="Exists('$(SQLiteInteropPath)')" />
-    <Warning Text="No se encontró SQLite.Interop.dll en la ruta esperada: $(SQLiteInteropPath). La aplicación puede fallar al inicializar la base de datos." Condition="!Exists('$(SQLiteInteropPath)')" />
+    <!-- Copiar solo la DLL de x86 ya que estamos usando x86 -->
+    <Copy SourceFiles="$(OutputPath)x86\SQLite.Interop.dll" DestinationFolder="$(OutputPath)" SkipUnchangedFiles="true" Condition="Exists('$(OutputPath)x86\SQLite.Interop.dll')" />
   </Target>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
-    <PlatformTarget>x64</PlatformTarget>
+    <PlatformTarget>x86</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
@@ -82,26 +76,6 @@
   </PropertyGroup>
   <PropertyGroup>
     <SignManifests>true</SignManifests>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x86'">
-    <DebugSymbols>true</DebugSymbols>
-    <OutputPath>bin\x86\Debug\</OutputPath>
-    <DefineConstants>DEBUG;TRACE</DefineConstants>
-    <DebugType>full</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>Default</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>true</Prefer32Bit>
-  </PropertyGroup>
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
-    <OutputPath>bin\x86\Release\</OutputPath>
-    <DefineConstants>TRACE</DefineConstants>
-    <Optimize>true</Optimize>
-    <DebugType>pdbonly</DebugType>
-    <PlatformTarget>x86</PlatformTarget>
-    <LangVersion>Default</LangVersion>
-    <ErrorReport>prompt</ErrorReport>
-    <Prefer32Bit>true</Prefer32Bit>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="EntityFramework, Version=6.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089, processorArchitecture=MSIL">
@@ -218,9 +192,6 @@
     </EmbeddedResource>
     <Content Include="logo_cec1.ico" />
     <Content Include="Resources\bonoFinal.html">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="Resources\recetaFinal.html">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <EmbeddedResource Include="frmSeleccionRecetarios.resx">

@@ -153,7 +153,6 @@ namespace Centro_Empleado
             // 
             // btnAnular
             // 
-            this.btnAnular.BackColor = System.Drawing.Color.FromArgb(((int)(((byte)(255)))), ((int)(((byte)(192)))), ((int)(((byte)(192)))));
             this.btnAnular.Enabled = false;
             this.btnAnular.Font = new System.Drawing.Font("Microsoft Sans Serif", 9F, System.Drawing.FontStyle.Bold, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.btnAnular.Location = new System.Drawing.Point(1084, 25);
@@ -162,7 +161,7 @@ namespace Centro_Empleado
             this.btnAnular.Size = new System.Drawing.Size(170, 31);
             this.btnAnular.TabIndex = 3;
             this.btnAnular.Text = "Anular Bono";
-            this.btnAnular.UseVisualStyleBackColor = false;
+            this.btnAnular.UseVisualStyleBackColor = true;
             // 
             // lblCantidadBonos
             // 

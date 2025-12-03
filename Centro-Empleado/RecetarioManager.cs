@@ -30,30 +30,10 @@ namespace Centro_Empleado
         {
             try
             {
-                // Buscar el template en diferentes ubicaciones posibles
-                string templatePath = null;
-                string baseDir = AppDomain.CurrentDomain.BaseDirectory;
-                
-                // Prioridad 1: Resources en el directorio de ejecución
-                string rutaResources = Path.Combine(baseDir, "Resources", "recetaFinal.html");
-                if (File.Exists(rutaResources))
+                string templatePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "recetaFinal.html");
+                if (!File.Exists(templatePath))
                 {
-                    templatePath = rutaResources;
-                }
-                // Prioridad 2: En el directorio de ejecución directamente
-                else
-                {
-                    string rutaDirecta = Path.Combine(baseDir, "recetaFinal.html");
-                    if (File.Exists(rutaDirecta))
-                    {
-                        templatePath = rutaDirecta;
-                    }
-                }
-                
-                if (string.IsNullOrEmpty(templatePath))
-                {
-                    throw new FileNotFoundException(string.Format("No se encontró la plantilla HTML de receta. Buscado en: {0} y {1}", 
-                        rutaResources, Path.Combine(baseDir, "recetaFinal.html")));
+                    throw new FileNotFoundException("No se encontró la plantilla HTML de receta.");
                 }
 
                 string templateHtml = File.ReadAllText(templatePath);
@@ -145,8 +125,7 @@ namespace Centro_Empleado
         {
             // Reemplazar placeholders de la primera receta (sin sufijo)
             html = html.Replace("{{NUMERO_TALONARIO}}", recetario.NumeroTalonario.ToString("D6"));
-            html = html.Replace("{{NUMERO_AFILIADO}}", WebUtility.HtmlEncode(afiliado.NumeroAfiliado ?? ""));
-            html = html.Replace("{{DNI}}", WebUtility.HtmlEncode(afiliado.DNI ?? "")); // Mantener para compatibilidad si existe en otros lugares
+            html = html.Replace("{{DNI}}", WebUtility.HtmlEncode(afiliado.DNI ?? ""));
             html = html.Replace("{{FECHA_EMISION}}", recetario.FechaEmision.ToString("dd/MM/yyyy"));
             html = html.Replace("{{FECHA_VENCIMIENTO}}", recetario.FechaVencimiento.ToString("dd/MM/yyyy"));
             html = html.Replace("{{APELLIDO_NOMBRE}}", WebUtility.HtmlEncode(afiliado.ApellidoNombre ?? ""));
@@ -159,8 +138,7 @@ namespace Centro_Empleado
         {
             // Reemplazar placeholders de la segunda receta (con sufijo SEGUNDO)
             html = html.Replace("{{NUMERO_TALONARIO_SEGUNDO}}", recetario.NumeroTalonario.ToString("D6"));
-            html = html.Replace("{{NUMERO_AFILIADO_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.NumeroAfiliado ?? ""));
-            html = html.Replace("{{DNI_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.DNI ?? "")); // Mantener para compatibilidad si existe en otros lugares
+            html = html.Replace("{{DNI_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.DNI ?? ""));
             html = html.Replace("{{FECHA_EMISION_SEGUNDO}}", recetario.FechaEmision.ToString("dd/MM/yyyy"));
             html = html.Replace("{{FECHA_VENCIMIENTO_SEGUNDO}}", recetario.FechaVencimiento.ToString("dd/MM/yyyy"));
             html = html.Replace("{{APELLIDO_NOMBRE_SEGUNDO}}", WebUtility.HtmlEncode(afiliado.ApellidoNombre ?? ""));
@@ -173,7 +151,7 @@ namespace Centro_Empleado
         {
             // Limpiar los placeholders del segundo formulario si no hay segunda receta
             string[] placeholders = {
-                "{{NUMERO_TALONARIO_SEGUNDO}}", "{{NUMERO_AFILIADO_SEGUNDO}}", "{{DNI_SEGUNDO}}", "{{FECHA_EMISION_SEGUNDO}}", 
+                "{{NUMERO_TALONARIO_SEGUNDO}}", "{{DNI_SEGUNDO}}", "{{FECHA_EMISION_SEGUNDO}}", 
                 "{{FECHA_VENCIMIENTO_SEGUNDO}}", "{{APELLIDO_NOMBRE_SEGUNDO}}", "{{EMPRESA_SEGUNDO}}"
             };
             
@@ -282,12 +260,8 @@ namespace Centro_Empleado
             g.DrawLine(pen, cuadroX + 80, y + 10, cuadroX + 80, y + 70);
             g.DrawLine(pen, cuadroX + 190, y + 10, cuadroX + 190, y + 70);
             g.DrawString("SOCIO Nº", fontPequeno, brush, cuadroX + 5, y + 15);
-            Font fontPequenoBold = new Font("Arial", 8, FontStyle.Bold);
-            g.DrawString(afiliado.NumeroAfiliado ?? "", fontPequenoBold, brush, cuadroX + 5, y + 35);
             g.DrawString("FECHA DE EMISION", fontPequeno, brush, cuadroX + 90, y + 15);
-            g.DrawString(recetario.FechaEmision.ToString("dd/MM/yyyy"), fontPequeno, brush, cuadroX + 90, y + 35);
             g.DrawString("VALIDO HASTA", fontPequeno, brush, cuadroX + 200, y + 15);
-            g.DrawString(recetario.FechaVencimiento.ToString("dd/MM/yyyy"), fontPequeno, brush, cuadroX + 200, y + 35);
 
             // Datos principales
             int lineaY = y + 80;

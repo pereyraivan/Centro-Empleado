@@ -264,87 +264,6 @@
             font-weight: bold;
         }
 
-        .medication-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 5px 0;
-        }
-
-        .medication-table th {
-            font-size: 8px;
-            padding: 2px 3px;
-            height: 20px;
-            color: #000;
-            text-align: center;
-            border: 1px solid #000;
-            font-weight: bold;
-            font-style: italic;
-        }
-
-        .medication-table th.medication-rp-column {
-            width: 40%;
-            text-align: left;
-            padding-left: 5px;
-            font-style: normal;
-        }
-
-        .medication-table th:not(.medication-rp-column) {
-            width: 15%;
-        }
-
-        .medication-table td {
-            height: 20px;
-            padding: 2px 3px;
-            border: 1px solid #000;
-            vertical-align: middle;
-        }
-
-        .medication-table td.medication-rp-column {
-            width: 40%;
-            text-align: left;
-            padding-left: 5px;
-            font-weight: bold;
-            font-size: 11px;
-        }
-
-        .medication-table td:not(.medication-rp-column) {
-            width: 15%;
-            text-align: center;
-        }
-
-        .medication-rp-text {
-            font-weight: bold;
-            font-size: 11px;
-        }
-
-        .medication-rp-underline {
-            text-decoration: underline;
-            text-decoration-color: #0066cc;
-        }
-
-        .payment-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 5px 0;
-        }
-
-        .payment-table th {
-            font-size: 9px;
-            padding: 2px 3px;
-            height: 20px;
-            color: #000;
-            text-align: center;
-            border: 1px solid #000;
-            font-weight: bold;
-        }
-
-        .payment-table td {
-            height: 20px;
-            padding: 2px 3px;
-            text-align: center;
-            border: 1px solid #000;
-        }
-
         .patient-name-input {
             margin-top: 3px; /* Reducido de 5px */
         }
@@ -502,7 +421,7 @@
                 <div class="header-fields">
                     <div class="field-row">
                         <span class="field-label">Socio Nº</span>
-                        <span style="font-weight: bold;">{{NUMERO_AFILIADO}}</span>
+                        <span>{{DNI}}</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Fecha de emisión</span>
@@ -544,30 +463,17 @@
                     </div>
                 </div>
 
-                <table class="medication-table">
+                <table>
                     <thead>
                         <tr>
-                            <th class="medication-rp-column"></th>
-                            <th>Cant. Recetada</th>
-                            <th>Prec. Unitario</th>
+                            <th>CANTIDAD RECETADA</th>
+                            <th>PRECIO UNITARIO</th>
                             <th>%</th>
-                            <th>Importe</th>
+                            <th>IMPORTE</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="fila-importes">
                         <tr>
-                            <td class="medication-rp-column">
-                                <span class="medication-rp-text">(1)<span class="medication-rp-underline">Rp.</span>:</span>
-                            </td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td class="medication-rp-column">
-                                <span class="medication-rp-text">(2)<span class="medication-rp-underline">Rp.</span>:</span>
-                            </td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -575,6 +481,40 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <div class="importe-total-row">
+                    <div class="importe-total-label">Importe Total</div>
+                    <div class="importe-total-box"></div>
+                </div>
+
+                <div class="checkbox-section">
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">OSECAC</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC C.E.C.</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC Farmacia</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="abonado-item">
+                        <div class="abonado-label">Abona Afiliado</div>
+                        <div class="abonado-box"></div>
+                    </div>
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(1) Rp.</div>
+                    <input type="text">
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(2) Rp.</div>
+                    <input type="text">
+                </div>
 
                 <div class="diagnosis-section">
                     <div class="diagnosis-box">
@@ -584,27 +524,6 @@
                         <div class="diagnosis-title">Diagnóstico (2)</div>
                     </div>
                 </div>
-
-                <table class="payment-table">
-                    <thead>
-                        <tr>
-                            <th>Importe Total</th>
-                            <th>OSECAC</th>
-                            <th>A/C. C.E.C</th>
-                            <th>A/C Farmacia</th>
-                            <th>Abonado por el afiliado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
 
                 <table class="signature-table">
                     <thead>
@@ -643,7 +562,7 @@
                 <div class="header-fields">
                     <div class="field-row">
                         <span class="field-label">Socio Nº</span>
-                        <span style="font-weight: bold;">{{NUMERO_AFILIADO_SEGUNDO}}</span>
+                        <span>{{DNI_SEGUNDO}}</span>
                     </div>
                     <div class="field-row">
                         <span class="field-label">Fecha de emisión</span>
@@ -685,30 +604,17 @@
                     </div>
                 </div>
 
-                <table class="medication-table">
+                <table>
                     <thead>
                         <tr>
-                            <th class="medication-rp-column"></th>
-                            <th>Cant. Recetada</th>
-                            <th>Prec. Unitario</th>
+                            <th>CANTIDAD RECETADA</th>
+                            <th>PRECIO UNITARIO</th>
                             <th>%</th>
-                            <th>Importe</th>
+                            <th>IMPORTE</th>
                         </tr>
                     </thead>
-                    <tbody>
+                    <tbody class="fila-importes">
                         <tr>
-                            <td class="medication-rp-column">
-                                <span class="medication-rp-text">(1)<span class="medication-rp-underline">Rp.</span>:</span>
-                            </td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                        <tr>
-                            <td class="medication-rp-column">
-                                <span class="medication-rp-text">(2)<span class="medication-rp-underline">Rp.</span>:</span>
-                            </td>
                             <td></td>
                             <td></td>
                             <td></td>
@@ -716,6 +622,40 @@
                         </tr>
                     </tbody>
                 </table>
+
+                <div class="importe-total-row">
+                    <div class="importe-total-label">Importe Total</div>
+                    <div class="importe-total-box"></div>
+                </div>
+
+                <div class="checkbox-section">
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">OSECAC</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC C.E.C.</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="checkbox-item">
+                        <div class="checkbox-label">AC Farmacia</div>
+                        <div class="checkbox-box"></div>
+                    </div>
+                    <div class="abonado-item">
+                        <div class="abonado-label">Abona Afiliado</div>
+                        <div class="abonado-box"></div>
+                    </div>
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(1) Rp.</div>
+                    <input type="text">
+                </div>
+
+                <div class="medication-row">
+                    <div class="medication-label">(2) Rp.</div>
+                    <input type="text">
+                </div>
 
                 <div class="diagnosis-section">
                     <div class="diagnosis-box">
@@ -725,27 +665,6 @@
                         <div class="diagnosis-title">Diagnóstico (2)</div>
                     </div>
                 </div>
-
-                <table class="payment-table">
-                    <thead>
-                        <tr>
-                            <th>Importe Total</th>
-                            <th>OSECAC</th>
-                            <th>A/C. C.E.C</th>
-                            <th>A/C Farmacia</th>
-                            <th>Abonado por el afiliado</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                            <td></td>
-                        </tr>
-                    </tbody>
-                </table>
 
                 <table class="signature-table">
                     <thead>
